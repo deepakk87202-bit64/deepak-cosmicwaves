@@ -125,6 +125,21 @@
   }
   .btn:hover { transform: translateY(-3px); }
 
+  /* === LEADERBOARD STYLES === */
+  .leaderboard-box {
+    margin: 15px 0; padding: 15px; background: rgba(0,0,0,0.05);
+    border-radius: 15px; text-align: left;
+  }
+  .leaderboard-box h3 { text-align: center; color: var(--accent); margin-bottom: 10px; }
+  .leaderboard-list {
+    list-style: none; margin: 0; padding: 0; max-height: 120px; overflow-y: auto;
+  }
+  .leaderboard-list li {
+    display: flex; justify-content: space-between; padding: 8px;
+    border-bottom: 1px solid var(--panel-border); font-size: 1rem;
+  }
+  .leaderboard-list li:last-child { border-bottom: none; }
+
   /* === GAME AREA === */
   #game-area { display: none; flex-direction: column; align-items: center; }
   #game-area.active { display: flex; }
@@ -155,7 +170,7 @@
   #btn-right { grid-column: 3; grid-row: 2; }
 
   @media (min-width: 768px) { .controls { display: none; } }
-  @media (max-width: 600px) { .search-bar, .nav-links span { display: none; } } /* Hide search on small phones */
+  @media (max-width: 600px) { .search-bar, .nav-links span { display: none; } }
 </style>
 </head>
 <body>
@@ -194,7 +209,7 @@
   <span class="close-btn" onclick="closeModals()">&times;</span>
   <h1><i class="fa-solid fa-laptop-code"></i> About Creator</h1>
   <p><strong>Developed by:</strong> Deepak</p>
-  <p>This is a professional-grade Snake Game built with HTML5 Canvas, featuring custom 3D textures, audio integration, and dynamic UI themes.</p>
+  <p>This is a professional-grade Snake Game built with HTML5 Canvas, featuring custom 3D textures, audio integration, dynamic UI themes, and a live leaderboard.</p>
 </div>
 
 <div class="container">
@@ -207,6 +222,12 @@
   <div id="game-over-screen" class="screen glass">
     <h1 style="color: var(--apple-color);">Game Over!</h1>
     <h2>Score: <span id="final-score">0</span></h2>
+    
+    <div class="leaderboard-box">
+      <h3><i class="fa-solid fa-trophy" style="color:gold;"></i> Top Players</h3>
+      <ul class="leaderboard-list" id="leaderboard-list"></ul>
+    </div>
+
     <button class="btn" onclick="startGame()"><i class="fa-solid fa-rotate-right"></i> Play Again</button>
   </div>
 
@@ -224,8 +245,8 @@
     </div>
   </div>
 </div>
-  
-  <script>
+
+<script>
   // === THEME & UI LOGIC ===
   function setTheme(themeName) {
     if(themeName === '') document.body.removeAttribute('data-theme');
@@ -263,7 +284,7 @@
   
   let snake = []; let dx = 0; let dy = 0; let nextDx = 0; let nextDy = 0;
   let foodX; let foodY; let score = 0;
-  let highScore = localStorage.getItem('snakeHighScoreX') || 0;
+  let highScore = localStorage.getItem('snakeHighScorePro') || 0;
   let gameLoop; let gameSpeed = 150; let isPlaying = false;
 
   document.getElementById('high-score').innerText = highScore;
@@ -360,7 +381,7 @@
       if (gameSpeed > 60) gameSpeed -= 2; 
       if (score > highScore) {
         highScore = score; document.getElementById('high-score').innerText = highScore;
-        localStorage.setItem('snakeHighScoreX', highScore);
+        localStorage.setItem('snakeHighScorePro', highScore);
       }
       spawnFood();
     } else { snake.pop(); }
@@ -378,7 +399,7 @@
     let x = foodX * gridSize + gridSize/2; let y = foodY * gridSize + gridSize/2;
     let grad = ctx.createRadialGradient(x-3, y-3, 1, x, y, gridSize/2);
     grad.addColorStop(0, "#ff9999"); 
-    grad.addColorStop(0.6, appleColor); // Yahi mistake thi jo ab fix ho gayi hai!
+    grad.addColorStop(0.6, appleColor); 
     grad.addColorStop(1, "#8b0000");
     
     ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(x, y, gridSize/2 - 2, 0, 2*Math.PI); ctx.fill();
@@ -396,6 +417,42 @@
     document.getElementById('game-area').classList.remove('active');
     document.getElementById('game-over-screen').classList.add('active');
     document.getElementById('final-score').innerText = score;
+    updateLeaderboard(score);
+  }
+
+  // === LEADERBOARD LOGIC ===
+  function updateLeaderboard(newScore) {
+    let leaderboard = JSON.parse(localStorage.getItem('snakeLeaderboardPro')) || [];
+    
+    // Add new score if it's greater than 0
+    if(newScore > 0) {
+      let today = new Date();
+      let dateString = today.getDate() + "/" + (today.getMonth() + 1); // e.g., "12/4"
+      leaderboard.push({ date: dateString, score: newScore });
+      
+      // Sort highest to lowest
+      leaderboard.sort((a, b) => b.score - a.score);
+      
+      // Keep only top 5
+      leaderboard = leaderboard.slice(0, 5); 
+      localStorage.setItem('snakeLeaderboardPro', JSON.stringify(leaderboard));
+    }
+
+    // Display Leaderboard
+    const listUI = document.getElementById('leaderboard-list');
+    listUI.innerHTML = '';
+    
+    if(leaderboard.length === 0) {
+      listUI.innerHTML = '<li>No scores yet. Play to rank up!</li>';
+    } else {
+      leaderboard.forEach((entry, idx) => {
+        let li = document.createElement('li');
+        // Medal icons for Top 3
+        let icon = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : '👤';
+        li.innerHTML = `<span>${icon} Rank ${idx+1} (${entry.date})</span> <strong>${entry.score} pts</strong>`;
+        listUI.appendChild(li);
+      });
+    }
   }
 </script>
 </body>
