@@ -3,151 +3,312 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Deepak Games | Pro Snake</title>
+<title>Deepak Games | Snake Xtreme Pro</title>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 <style>
+  /* === THEMES & VARIABLES (Refined like Ludo) === */
   :root {
     --bg-grad: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
-    --panel-bg: rgba(255, 255, 255, 0.8);
-    --text-main: #0f172a; --accent: #0284c7;
+    --panel-bg: rgba(255, 255, 255, 0.7);
+    --panel-border: rgba(255, 255, 255, 0.5);
+    --text-main: #0f172a;
+    --accent: #0284c7;
+    --canvas-bg: #ffffff;
+    --grid-color: rgba(0, 0, 0, 0.05);
   }
-  [data-theme="dark"] { --bg-grad: linear-gradient(135deg, #111827 0%, #1f2937 100%); --panel-bg: rgba(17, 24, 39, 0.9); --text-main: #f8fafc; --accent: #9ca3af; }
+
+  [data-theme="dark"] {
+    --bg-grad: linear-gradient(135deg, #111827 0%, #1f2937 100%);
+    --panel-bg: rgba(17, 24, 39, 0.8);
+    --panel-border: rgba(255, 255, 255, 0.1);
+    --text-main: #f8fafc;
+    --accent: #9ca3af;
+    --canvas-bg: #1f2937;
+    --grid-color: rgba(255, 255, 255, 0.05);
+  }
+
   [data-theme="green"] { --bg-grad: linear-gradient(135deg, #dcfce7 0%, #86efac 100%); --accent: #16a34a; --text-main: #14532d; }
   [data-theme="pink"] { --bg-grad: linear-gradient(135deg, #fce7f3 0%, #f9a8d4 100%); --accent: #db2777; --text-main: #831843; }
   [data-theme="yellow"] { --bg-grad: linear-gradient(135deg, #fef9c3 0%, #fde047 100%); --text-main: #422006; --accent: #ca8a04; }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
-  body { background: var(--bg-grad); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; align-items: center; transition: 0.5s; }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; user-select: none; }
   
-  nav { width: 100%; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; background: var(--panel-bg); box-shadow: 0 4px 15px rgba(0,0,0,0.1); flex-wrap: wrap; gap: 10px; }
-  .nav-btn { text-decoration: none; color: white; background: var(--accent); padding: 8px 15px; border-radius: 10px; font-weight: bold; transition: 0.3s; }
-  .theme-box { display: flex; gap: 10px; }
-  .theme-dot { width: 25px; height: 25px; border-radius: 50%; cursor: pointer; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+  body {
+    background: var(--bg-grad); color: var(--text-main);
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center;
+    transition: background 0.5s ease; padding-top: 70px; overflow-x: hidden;
+  }
+
+  .glass {
+    background: var(--panel-bg); backdrop-filter: blur(12px);
+    border: 1px solid var(--panel-border); border-radius: 20px;
+    box-shadow: 0 8px 32px 0 rgba(0,0,0,0.15);
+  }
+
+  /* === TOP NAVBAR === */
+  nav {
+    position: fixed; top: 0; width: 100%; padding: 10px 5%;
+    display: flex; justify-content: space-between; align-items: center;
+    z-index: 100; flex-wrap: wrap; gap: 10px; border-radius: 0 0 20px 20px;
+  }
+
+  .logo { font-size: 1.5rem; font-weight: 800; color: var(--accent); }
+
+  /* Hub Links */
+  .nav-links { display: flex; gap: 10px; align-items: center; }
+  .nav-link {
+    text-decoration: none; color: white; font-weight: bold;
+    background: var(--accent); padding: 6px 12px; border-radius: 10px; transition: 0.3s; font-size: 0.9rem;
+  }
+  .nav-link:hover { transform: translateY(-2px); }
+
+  /* Theme Selector */
+  .theme-box { display: flex; gap: 8px; }
+  .theme-dot {
+    width: 22px; height: 22px; border-radius: 50%; cursor: pointer; border: 2px solid white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3); transition: transform 0.2s;
+  }
+  .theme-dot:hover { transform: scale(1.2); }
+
+  /* === GAME AREA === */
+  .game-container {
+    display: flex; flex-direction: column; align-items: center;
+    width: 95%; max-width: 400px; margin-top: 20px;
+  }
+
+  /* HUD (Score & High Score) */
+  .hud {
+    display: flex; justify-content: space-between; width: 100%;
+    margin-bottom: 15px; padding: 10px 20px; font-weight: bold; font-size: 1.2rem;
+  }
+
+  /* Canvas */
+  canvas {
+    border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    border: 4px solid var(--panel-border); width: 100%; aspect-ratio: 1;
+  }
+
+  /* === D-PAD CONTROLS (Mobile) === */
+  .dpad {
+    margin-top: 25px; width: 160px; height: 160px;
+    display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);
+    gap: 10px; justify-items: center; align-items: center;
+  }
+  .dbtn {
+    width: 50px; height: 50px; display: flex; justify-content: center; align-items: center;
+    font-size: 1.5rem; color: var(--text-main); cursor: pointer;
+    transition: 0.1s; border-radius: 15px;
+  }
+  .dbtn:active { transform: scale(0.9); background: rgba(0, 0, 0, 0.1); }
   
-  .game-container { margin-top: 30px; text-align: center; }
-  .hud { display: flex; justify-content: space-between; width: 400px; margin-bottom: 10px; font-size: 1.5rem; font-weight: bold; background: var(--panel-bg); padding: 10px 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-  canvas { background: #ffffff; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border: 4px solid var(--accent); }
-  
-  #start-btn { margin-top: 20px; padding: 15px 40px; font-size: 1.2rem; font-weight: bold; border-radius: 30px; border: none; background: var(--accent); color: white; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+  /* Positions */
+  #up { grid-column: 2; grid-row: 1; }
+  #left { grid-column: 1; grid-row: 2; }
+  #right { grid-column: 3; grid-row: 2; }
+  #down { grid-column: 2; grid-row: 3; }
+
+  @media (min-width: 768px) { .dpad { display: none; } } /* Hide on PC */
+
+  /* Start/Replay Button */
+  .game-btn {
+    margin-top: 20px; padding: 12px 30px; font-size: 1.2rem; font-weight: bold;
+    border-radius: 25px; border: none; background: var(--accent); color: white;
+    cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.2); transition: 0.3s;
+  }
+  .game-btn:hover { transform: translateY(-3px); }
   .hidden { display: none !important; }
+
 </style>
 </head>
 <body>
 
-<nav>
-  <h2><i class="fa-solid fa-dragon"></i> Deepak Games</h2>
+<nav class="glass">
+  <div class="logo"><i class="fa-solid fa-snake"></i> Xtreme Pro</div>
+  
   <div class="theme-box">
-    <div class="theme-dot" style="background: #0284c7;" onclick="setTheme('', '#0284c7', '#38bdf8', '#ef4444')"></div>
-    <div class="theme-dot" style="background: #111827;" onclick="setTheme('dark', '#9ca3af', '#d1d5db', '#ef4444')"></div>
-    <div class="theme-dot" style="background: #16a34a;" onclick="setTheme('green', '#14532d', '#22c55e', '#ef4444')"></div>
-    <div class="theme-dot" style="background: #db2777;" onclick="setTheme('pink', '#831843', '#ec4899', '#db2777')"></div>
-    <div class="theme-dot" style="background: #ca8a04;" onclick="setTheme('yellow', '#713f12', '#eab308', '#ca8a04')"></div>
+    <div class="theme-dot" style="background: #0284c7;" onclick="setTheme('', '#0369a1', '#38bdf8', '#ef4444')" title="Blue"></div>
+    <div class="theme-dot" style="background: #111827;" onclick="setTheme('dark', '#d1d5db', '#6b7280', '#ef4444')" title="Black"></div>
+    <div class="theme-dot" style="background: #16a34a;" onclick="setTheme('green', '#14532d', '#22c55e', '#ef4444')" title="Green"></div>
+    <div class="theme-dot" style="background: #db2777;" onclick="setTheme('pink', '#831843', '#ec4899', '#db2777')" title="Pink"></div>
+    <div class="theme-dot" style="background: #ca8a04;" onclick="setTheme('yellow', '#713f12', '#eab308', '#ca8a04')" title="Yellow"></div>
   </div>
-  <div>
-    <a href="tictactoe.html" class="nav-btn">Tic-Tac-Toe</a>
-    <a href="ludo.html" class="nav-btn" style="background: #ef4444;">Ludo</a>
+
+  <div class="nav-links">
+    <a href="tictactoe.html" class="nav-link"><i class="fa-solid fa-xmarks-lines"></i> Tic-Tac</a>
+    <a href="ludo.html" class="nav-link" style="background: #ef4444;"><i class="fa-solid fa-dice"></i> Ludo</a>
   </div>
 </nav>
 
 <div class="game-container">
-  <div class="hud">
+  <div class="hud glass">
     <div>🍎 <span id="score">0</span></div>
     <div>👑 <span id="high-score">0</span></div>
   </div>
+  
   <canvas id="gameCanvas" width="400" height="400"></canvas>
-  <br>
-  <button id="start-btn" onclick="startGame()">▶ Start Game</button>
+  
+  <button id="start-btn" class="game-btn" onclick="startGame()">▶ Start Game</button>
+
+  <div class="dpad hidden" id="dpad-cont">
+    <div class="dbtn glass" id="up" onclick="setDirection(0, -1)"><i class="fa-solid fa-chevron-up"></i></div>
+    <div class="dbtn glass" id="left" onclick="setDirection(-1, 0)"><i class="fa-solid fa-chevron-left"></i></div>
+    <div class="dbtn glass" id="right" onclick="setDirection(1, 0)"><i class="fa-solid fa-chevron-right"></i></div>
+    <div class="dbtn glass" id="down" onclick="setDirection(0, 1)"><i class="fa-solid fa-chevron-down"></i></div>
+  </div>
 </div>
 
 <script>
-  // Game Variables
+  // === Game Engine Variables ===
   const canvas = document.getElementById('gameCanvas');
   const ctx = canvas.getContext('2d');
-  const grid = 20;
-  let snake = []; let food = {}; let dx = 0; let dy = -grid;
-  let score = 0; let highScore = localStorage.getItem('snk_hs') || 0;
-  let loop; let isPlaying = false;
+  const gridSize = 20; // Size of one cell
+  const tileCount = canvas.width / gridSize; // 20x20 grid
 
-  // Hardcoded Colors to prevent blank screen
-  let colors = { head: '#0284c7', body: '#38bdf8', apple: '#ef4444', bg: '#f8fafc', grid: '#e2e8f0' };
+  let snake = []; let food = {}; let dx = 0; let dy = 0;
+  let score = 0; let highScore = localStorage.getItem('snk_pro_hs') || 0;
+  let loop; let gameSpeed = 120; let isPlaying = false;
+
+  // Hardcoded colors to prevent blank screen (will update with theme)
+  let clr = { head: '#0369a1', body: '#38bdf8', apple: '#ef4444', bg: '#ffffff', grid: 'rgba(0,0,0,0.05)' };
 
   document.getElementById('high-score').innerText = highScore;
 
+  // === UI & THEME LOGIC ===
   function setTheme(theme, head, body, apple) {
     document.body.setAttribute('data-theme', theme);
-    colors.head = head; colors.body = body; colors.apple = apple;
-    colors.bg = theme === 'dark' ? '#1f2937' : '#ffffff';
-    colors.grid = theme === 'dark' ? '#374151' : '#e2e8f0';
-    if(!isPlaying) drawBase();
+    // Update hardcoded canvas colors
+    clr.head = head; clr.body = body; clr.apple = apple;
+    clr.bg = theme === 'dark' ? '#1f2937' : '#ffffff';
+    clr.grid = theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
+    if(!isPlaying) drawBase(); // Redraw if game is not running
   }
 
-  // Audio Safely
+  // === AUDIO SYSTEM ===
   function playSound(type) {
     try {
       let a = new Audio(type + '.mp3');
-      a.play().catch(e => {}); // Ignores error if MP3 is missing
+      a.play().catch(e => {}); // Silently ignore if MP3s are missing
     } catch(e) {}
   }
 
-  document.addEventListener('keydown', e => {
-    if(!isPlaying) return;
-    if(e.key === 'ArrowLeft' && dx === 0) { dx = -grid; dy = 0; }
-    else if(e.key === 'ArrowUp' && dy === 0) { dx = 0; dy = -grid; }
-    else if(e.key === 'ArrowRight' && dx === 0) { dx = grid; dy = 0; }
-    else if(e.key === 'ArrowDown' && dy === 0) { dx = 0; dy = grid; }
-  });
+  // === CONTROLS LOGIC ===
+  document.addEventListener('keydown', changeDirection);
 
+  function changeDirection(e) {
+    if(!isPlaying) return;
+    const key = e.key;
+    if((key === 'ArrowLeft' || key === 'a') && dx === 0) { dx = -gridSize; dy = 0; }
+    else if((key === 'ArrowUp' || key === 'w') && dy === 0) { dx = 0; dy = -gridSize; }
+    else if((key === 'ArrowRight' || key === 'd') && dx === 0) { dx = gridSize; dy = 0; }
+    else if((key === 'ArrowDown' || key === 's') && dy === 0) { dx = 0; dy = gridSize; }
+  }
+
+  // D-Pad Helper
+  function setDirection(newDx, newDy) {
+    if(!isPlaying) return;
+    if(newDx !== 0 && dx === 0) { dx = newDx * gridSize; dy = 0; }
+    else if(newDy !== 0 && dy === 0) { dx = 0; dy = newDy * gridSize; }
+  }
+
+  // === GAME LOOP ===
   function spawnFood() {
-    food = { x: Math.floor(Math.random() * (canvas.width/grid)) * grid, y: Math.floor(Math.random() * (canvas.height/grid)) * grid };
+    food = {
+      x: Math.floor(Math.random() * tileCount) * gridSize,
+      y: Math.floor(Math.random() * tileCount) * gridSize
+    };
+    // Don't spawn food on snake body
+    for(let part of snake) if(part.x === food.x && part.y === food.y) spawnFood();
   }
 
   function startGame() {
+    // UI Updates
     document.getElementById('start-btn').classList.add('hidden');
-    snake = [{x: 200, y: 200}, {x: 200, y: 220}];
-    dx = 0; dy = -grid; score = 0; document.getElementById('score').innerText = score;
+    document.getElementById('dpad-cont').classList.remove('hidden');
+    
+    // Reset Variables
+    snake = [{x: 200, y: 200}, {x: 200, y: 220}, {x: 200, y: 240}];
+    dx = 0; dy = -gridSize; // Start moving up
+    score = 0; gameSpeed = 120; document.getElementById('score').innerText = score;
     spawnFood(); isPlaying = true;
+    
+    // Start Loop
     if(loop) clearInterval(loop);
-    loop = setInterval(gameStep, 100);
+    loop = setInterval(gameStep, gameSpeed);
   }
 
   function gameStep() {
-    let head = {x: snake[0].x + dx, y: snake[0].y + dy};
+    if(!isPlaying) return;
     
-    // Wall Collision
+    // Calculate new head position
+    let head = { x: snake[0].x + dx, y: snake[0].y + dy };
+
+    // COLLISION: Wall check
     if(head.x < 0 || head.x >= canvas.width || head.y < 0 || head.y >= canvas.height) return gameOver();
-    // Self Collision
+    // COLLISION: Self check
     for(let i=0; i<snake.length; i++) if(head.x === snake[i].x && head.y === snake[i].y) return gameOver();
 
-    snake.unshift(head);
+    snake.unshift(head); // Add new head
 
-    // Eat Apple
+    // EAT APPLE logic
     if(head.x === food.x && head.y === food.y) {
-      playSound('eat'); score += 10; document.getElementById('score').innerText = score;
-      if(score > highScore) { highScore = score; localStorage.setItem('snk_hs', highScore); document.getElementById('high-score').innerText = highScore; }
+      playSound('eat');
+      score += 10; document.getElementById('score').innerText = score;
+      if(score > highScore) {
+        highScore = score;
+        localStorage.setItem('snk_pro_hs', highScore);
+        document.getElementById('high-score').innerText = highScore;
+      }
       spawnFood();
-    } else { snake.pop(); }
+      // Speed up slightly
+      if(gameSpeed > 50) { clearInterval(loop); gameSpeed -= 2; loop = setInterval(gameStep, gameSpeed); }
+    } else {
+      snake.pop(); // Remove tail if not eating
+    }
 
     drawBase();
   }
 
+  // === REFINED 3D DRAWING ===
   function drawBase() {
     // Background & Grid
-    ctx.fillStyle = colors.bg; ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.strokeStyle = colors.grid; ctx.lineWidth = 1;
-    for(let i=0; i<canvas.width; i+=grid) { ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i,canvas.height); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0,i); ctx.lineTo(canvas.width,i); ctx.stroke(); }
+    ctx.fillStyle = clr.bg; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.strokeStyle = clr.grid; ctx.lineWidth = 1;
+    for(let i=0; i<=canvas.width; i+=gridSize) {
+      ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, canvas.height); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(canvas.width, i); ctx.stroke();
+    }
     
-    // Draw Food (Apple)
-    ctx.fillStyle = colors.apple; ctx.beginPath(); ctx.arc(food.x + grid/2, food.y + grid/2, grid/2 - 2, 0, Math.PI*2); ctx.fill();
-    
-    // Draw Snake
+    // Draw Food (3D Apple icon vibe)
+    let fx = food.x + gridSize/2; let fy = food.y + gridSize/2;
+    let fGrad = ctx.createRadialGradient(fx-3, fy-3, 1, fx, fy, gridSize/2);
+    fGrad.addColorStop(0, "#ffaaaa"); fGrad.addColorStop(0.8, clr.apple); fGrad.addColorStop(1, "#880000");
+    ctx.fillStyle = fGrad; ctx.beginPath(); ctx.arc(fx, fy, gridSize/2 - 2, 0, Math.PI*2); ctx.fill();
+    // Leaf
+    ctx.fillStyle = "#22c55e"; ctx.beginPath(); ctx.ellipse(fx+2, fy-6, 4, 2, Math.PI/4, 0, Math.PI*2); ctx.fill();
+
+    // Draw Snake (Refined 3D Caterpillar)
     snake.forEach((part, i) => {
-      ctx.fillStyle = i === 0 ? colors.head : colors.body;
-      ctx.fillRect(part.x + 1, part.y + 1, grid - 2, grid - 2);
+      let sx = part.x + gridSize/2; let sy = part.y + gridSize/2;
+      let sGrad = ctx.createRadialGradient(sx-2, sy-2, 1, sx, sy, gridSize/2);
+      
+      if(i === 0) { // Head
+        sGrad.addColorStop(0, "#ffffff"); sGrad.addColorStop(0.5, clr.head); sGrad.addColorStop(1, "#001133");
+      } else { // Body
+        sGrad.addColorStop(0, "#ffffff"); sGrad.addColorStop(0.5, clr.body); sGrad.addColorStop(1, "#111111");
+      }
+      
+      ctx.fillStyle = sGrad; ctx.beginPath(); ctx.arc(sx, sy, gridSize/2 - 1, 0, Math.PI*2); ctx.fill();
     });
   }
 
   drawBase(); // Initial render
-  function gameOver() { playSound('die'); isPlaying = false; clearInterval(loop); document.getElementById('start-btn').classList.remove('hidden'); document.getElementById('start-btn').innerText = "Game Over! Replay 🔄"; }
+
+  function gameOver() {
+    playSound('die'); isPlaying = false; clearInterval(loop);
+    document.getElementById('dpad-cont').classList.add('hidden');
+    let btn = document.getElementById('start-btn');
+    btn.classList.remove('hidden'); btn.innerText = "Game Over! Replay 🔄";
+  }
 </script>
 </body>
 </html>
