@@ -3,44 +3,53 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Deepak Games | Red vs Blue Ludo</title>
+<title>Deepak Games | Pro Path Ludo</title>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 <style>
-  :root { --bg: #f0f9ff; --red: #ef4444; --blue: #3b82f6; --accent: #0284c7; }
+  :root { --bg: #f8fafc; --red: #ef4444; --blue: #3b82f6; --accent: #0284c7; --border: #334155; }
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; user-select: none; }
-  body { background: var(--bg); display: flex; flex-direction: column; align-items: center; padding-top: 60px; }
-  
-  nav { position: fixed; top: 0; width: 100%; padding: 10px; background: white; display: flex; justify-content: space-around; box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 100; }
-  .nav-btn { text-decoration: none; color: var(--accent); font-weight: bold; font-size: 0.9rem; }
+  body { background: var(--bg); display: flex; flex-direction: column; align-items: center; padding-top: 70px; }
 
-  .hud { display: flex; align-items: center; gap: 20px; margin-bottom: 20px; }
-  .status { font-size: 1.5rem; font-weight: bold; padding: 10px 20px; background: white; border-radius: 10px; min-width: 200px; text-align: center; }
-  
-  .dice { width: 70px; height: 70px; background: white; border: 3px solid #333; border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 2.5rem; cursor: pointer; box-shadow: 0 5px 10px rgba(0,0,0,0.2); }
-  .rolling { animation: spin 0.3s infinite; }
-  @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  /* Navbar */
+  nav { position: fixed; top: 0; width: 100%; padding: 12px; background: white; display: flex; justify-content: space-around; box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 100; }
+  .nav-btn { text-decoration: none; color: var(--accent); font-weight: bold; }
 
-  .board-container { position: relative; width: 350px; height: 350px; background: white; border: 5px solid #333; border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+  /* HUD */
+  .hud { display: flex; align-items: center; gap: 20px; margin-bottom: 15px; }
+  .status { font-size: 1.3rem; font-weight: bold; padding: 10px 20px; background: white; border-radius: 12px; border: 2px solid #ddd; min-width: 180px; text-align: center; }
+  .dice { width: 65px; height: 65px; background: white; border: 3px solid var(--border); border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 2.5rem; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.2); transition: 0.1s; }
+  .rolling { animation: shake 0.2s infinite; }
+  @keyframes shake { 0% { transform: rotate(10deg); } 50% { transform: rotate(-10deg); } 100% { transform: rotate(10deg); } }
+
+  /* Board Wrapper */
+  .board { position: relative; width: 360px; height: 360px; background: white; border: 4px solid var(--border); display: grid; grid-template-columns: repeat(15, 1fr); grid-template-rows: repeat(15, 1fr); }
   
+  /* Path Cells */
+  .cell { border: 1px solid #ddd; }
+  .red-path { background: #fee2e2; }
+  .blue-path { background: #dbeafe; }
+  .safe { background: #e2e8f0 !important; }
+  .safe::after { content: '★'; display: flex; justify-content: center; align-items: center; height: 100%; color: #94a3b8; font-size: 0.8rem; }
+
   /* Bases */
-  .base { position: absolute; width: 40%; height: 40%; border: 2px solid #333; display: flex; justify-content: center; align-items: center; }
-  .base-red { top: 0; left: 0; background: var(--red); }
-  .base-blue { bottom: 0; right: 0; background: var(--blue); }
-  .base-white { width: 60%; height: 60%; background: white; border-radius: 10px; }
+  .base { grid-column: span 6; grid-row: span 6; border: 2px solid var(--border); display: flex; justify-content: center; align-items: center; }
+  .red-base { background: var(--red); grid-area: 1 / 1 / 7 / 7; }
+  .blue-base { background: var(--blue); grid-area: 10 / 10 / 16 / 16; }
+  .inner { width: 60%; height: 60%; background: white; border-radius: 8px; position: relative; }
 
   /* Tokens */
-  .token { position: absolute; width: 28px; height: 28px; border-radius: 50%; border: 3px solid white; box-shadow: 0 4px 8px rgba(0,0,0,0.4); transition: all 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28); z-index: 50; }
-  #token-red { background: var(--red); top: 15%; left: 15%; }
-  #token-blue { background: var(--blue); bottom: 15%; right: 15%; }
+  .token { position: absolute; width: 22px; height: 22px; border-radius: 50%; border: 2px solid white; box-shadow: 0 3px 6px rgba(0,0,0,0.4); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 50; }
+  .t-red { background: var(--red); }
+  .t-blue { background: var(--blue); }
 
-  .win-msg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.9); color: gold; padding: 20px; border-radius: 10px; font-size: 1.5rem; text-align: center; display: none; z-index: 100; width: 80%; }
+  .win-msg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.9); color: gold; padding: 25px; border-radius: 15px; text-align: center; display: none; z-index: 100; width: 80%; border: 2px solid gold; }
 </style>
 </head>
 <body>
 
 <nav>
   <a href="index.html" class="nav-btn">← Snake</a>
-  <span style="font-weight: bold; color: #333;">Deepak Games Hub</span>
+  <span style="font-weight: bold;">Deepak Pro Ludo</span>
   <a href="tictactoe.html" class="nav-btn">Tic-Tac-Toe →</a>
 </nav>
 
@@ -49,125 +58,124 @@
   <div id="dice" class="dice" onclick="roll()">⚀</div>
 </div>
 
-<div class="board-container" id="board">
-  <div class="base base-red"><div class="base-white"></div></div>
-  <div class="base base-blue"><div class="base-white"></div></div>
+<div class="board" id="board-grid">
+  <div style="grid-area: 7/7/10/10; background: #eee; border: 2px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:0.7rem; font-weight:bold;">HOME</div>
   
-  <div id="token-red" class="token"></div>
-  <div id="token-blue" class="token"></div>
+  <div class="base red-base"><div class="inner" id="red-home-spot"></div></div>
+  <div class="base blue-base"><div class="inner" id="blue-home-spot"></div></div>
+
+  <div id="token-red" class="token t-red"></div>
+  <div id="token-blue" class="token t-blue"></div>
   
   <div id="win-screen" class="win-msg"></div>
 </div>
 
 <script>
-  const status = document.getElementById('status');
-  const dice = document.getElementById('dice');
+  const board = document.getElementById('board-grid');
   const tokRed = document.getElementById('token-red');
   const tokBlue = document.getElementById('token-blue');
-  const winScreen = document.getElementById('win-screen');
+  const dice = document.getElementById('dice');
+  const status = document.getElementById('status');
 
-  let turn = 'red'; 
-  let isRolling = false;
-  let pos = { red: -1, blue: -1 }; // -1 means in base
-  const totalSteps = 20; // Simplified track for no-lag experience
+  // Audio System
+  const actx = new (window.AudioContext || window.webkitAudioContext)();
+  function playSound(f, d) {
+    if(actx.state === 'suspended') actx.resume();
+    let osc = actx.createOscillator(); let g = actx.createGain();
+    osc.connect(g); g.connect(actx.destination);
+    osc.frequency.setValueAtTime(f, actx.currentTime);
+    g.gain.setValueAtTime(0.1, actx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.01, actx.currentTime + d);
+    osc.start(); osc.stop(actx.currentTime + d);
+  }
 
-  // Manual Coordinates for Red & Blue path to prevent any "stuck" issues
-  const pathRed = [
-    {b:15, l:45}, {b:30, l:45}, {b:45, l:45}, {b:60, l:45}, {b:75, l:45}, 
-    {b:85, l:30}, {b:85, l:15}, {b:70, l:15}, {b:55, l:15}, {b:40, l:15}, 
-    {b:25, l:15}, {b:10, l:15}, {b:5, l:30}, {b:5, l:45}, {b:5, l:60},
-    {b:20, l:70}, {b:35, l:80}, {b:50, l:85}, {b:70, l:85}, {b:45, l:45} // Home
-  ];
+  // Create Grid Cells
+  for(let i=1; i<=15; i++) {
+    for(let j=1; j<=15; j++) {
+      if(!((i<7 && j<7) || (i>9 && j>9) || (i>6 && i<10 && j>6 && j<10))) {
+        let c = document.createElement('div');
+        c.className = 'cell';
+        c.id = `cell-${i}-${j}`;
+        board.appendChild(c);
+      }
+    }
+  }
 
-  const pathBlue = [
-    {b:75, l:45}, {b:60, l:45}, {b:45, l:45}, {b:30, l:45}, {b:15, l:45},
-    {b:5, l:60}, {b:5, l:75}, {b:20, l:75}, {b:35, l:75}, {b:50, l:75},
-    {b:65, l:75}, {b:80, l:75}, {b:85, l:60}, {b:85, l:45}, {b:85, l:30},
-    {b:70, l:20}, {b:55, l:10}, {b:40, l:5}, {b:20, l:5}, {b:45, l:45} // Home
-  ];
+  // Path Logic
+  const redPath = [[7,2],[7,3],[7,4],[7,5],[7,6],[6,7],[5,7],[4,7],[3,7],[2,7],[1,7],[1,8],[1,9],[2,9],[3,9],[4,9],[5,9],[6,9],[7,10],[7,11],[7,12],[7,13],[7,14],[8,14],[9,14],[9,13],[9,12],[9,11],[9,10],[10,9],[11,9],[12,9],[13,9],[14,9],[15,9],[15,8],[15,7],[14,7],[13,7],[12,7],[11,7],[10,7],[9,6],[9,5],[9,4],[9,3],[9,2],[9,1],[8,1],[7,1],[8,2],[8,3],[8,4],[8,5],[8,6],[8,7]]; 
+  const bluePath = [[9,14],[9,13],[9,12],[9,11],[9,10],[10,9],[11,9],[12,9],[13,9],[14,9],[15,9],[15,8],[15,7],[14,7],[13,7],[12,7],[11,7],[10,7],[9,6],[9,5],[9,4],[9,3],[9,2],[9,1],[8,1],[7,1],[7,2],[7,3],[7,4],[7,5],[7,6],[6,7],[5,7],[4,7],[3,7],[2,7],[1,7],[1,8],[1,9],[2,9],[3,9],[4,9],[5,9],[6,9],[7,10],[7,11],[7,12],[7,13],[7,14],[8,14],[8,13],[8,12],[8,11],[8,10],[8,9],[8,8]];
+
+  let pPos = { red: -1, blue: -1 };
+  let turn = 'red';
+  let moving = false;
+
+  function updatePos(color) {
+    let t = color === 'red' ? tokRed : tokBlue;
+    let idx = pPos[color];
+    let coords;
+    
+    if(idx === -1) {
+      coords = color === 'red' ? {r:3, c:3} : {r:12, c:12};
+    } else {
+      let p = color === 'red' ? redPath[idx] : bluePath[idx];
+      coords = {r: p[0], c: p[1]};
+    }
+    
+    let cellSize = 360/15;
+    t.style.top = ((coords.r - 1) * cellSize + 2) + 'px';
+    t.style.left = ((coords.c - 1) * cellSize + 2) + 'px';
+  }
+
+  updatePos('red'); updatePos('blue');
 
   function roll() {
-    if(isRolling) return;
-    isRolling = true;
+    if(moving) return;
+    playSound(400, 0.1);
     dice.classList.add('rolling');
-    
-    let rollVal = 0;
-    let count = 0;
-    let anim = setInterval(() => {
-      rollVal = Math.floor(Math.random() * 6) + 1;
-      dice.innerText = ['⚀','⚁','⚂','⚃','⚄','⚅'][rollVal-1];
-      count++;
-      if(count > 10) {
-        clearInterval(anim);
-        dice.classList.remove('rolling');
-        moveLogic(rollVal);
-      }
-    }, 50);
+    setTimeout(() => {
+      dice.classList.remove('rolling');
+      let v = Math.floor(Math.random() * 6) + 1;
+      dice.innerText = ['⚀','⚁','⚂','⚃','⚄','⚅'][v-1];
+      handleMove(v);
+    }, 400);
   }
 
-  function moveLogic(val) {
-    let p = turn === 'red' ? 'red' : 'blue';
-    let currentPos = pos[p];
-
-    if(currentPos === -1) {
-      if(val === 6) {
-        pos[p] = 0;
-        updateUI();
-        isRolling = false; // 6 gives another turn but simplified here to switch
-      } else {
-        switchTurn();
-      }
+  function handleMove(v) {
+    moving = true;
+    let p = turn;
+    if(pPos[p] === -1) {
+      if(v === 6) { pPos[p] = 0; updatePos(p); playSound(600, 0.2); }
+      finishTurn();
     } else {
-      let next = currentPos + val;
-      if(next >= totalSteps - 1) {
-        pos[p] = totalSteps - 1;
-        updateUI();
-        showWin(p);
-      } else {
-        // Step by step move
-        let i = 0;
-        let stepMove = setInterval(() => {
-          pos[p]++;
-          updateUI();
-          i++;
-          if(i >= val) {
-            clearInterval(stepMove);
-            checkCapture();
-            switchTurn();
-          }
-        }, 300);
-      }
+      let steps = 0;
+      let anim = setInterval(() => {
+        if(pPos[p] < (turn === 'red' ? redPath : bluePath).length - 1) {
+          pPos[p]++;
+          updatePos(p);
+          playSound(800, 0.05);
+          steps++;
+        }
+        if(steps >= v || pPos[p] >= (turn === 'red' ? redPath : bluePath).length - 1) {
+          clearInterval(anim);
+          if(pPos[p] >= (turn === 'red' ? redPath : bluePath).length - 1) showWin(p);
+          else finishTurn();
+        }
+      }, 250);
     }
   }
 
-  function updateUI() {
-    if(pos.red !== -1) {
-      tokRed.style.bottom = pathRed[pos.red].b + '%';
-      tokRed.style.left = pathRed[pos.red].l + '%';
-    }
-    if(pos.blue !== -1) {
-      tokBlue.style.bottom = pathBlue[pos.blue].b + '%';
-      tokBlue.style.left = pathBlue[pos.blue].l + '%';
-    }
-  }
-
-  function checkCapture() {
-    // Simplified capture: if same coord, back to base
-    if(pos.red !== -1 && pos.blue !== -1 && pos.red === pos.blue && pos.red < 15) {
-       // logic for capture could go here, but kept simple to avoid bugs
-    }
-  }
-
-  function switchTurn() {
+  function finishTurn() {
     turn = turn === 'red' ? 'blue' : 'red';
-    status.innerText = (turn === 'red' ? "Red" : "Blue") + "'s Turn";
+    status.innerText = (turn === 'red' ? 'Red' : 'Blue') + "'s Turn";
     status.style.color = turn === 'red' ? 'var(--red)' : 'var(--blue)';
-    isRolling = false;
+    moving = false;
   }
 
   function showWin(p) {
-    winScreen.innerHTML = `🏆 PLAYER ${p.toUpperCase()} WINS! 🏆<br><br><button onclick="location.reload()" style="padding:10px 20px; cursor:pointer;">Play Again</button>`;
-    winScreen.style.display = 'block';
+    playSound(1000, 1);
+    const ws = document.getElementById('win-screen');
+    ws.innerHTML = `<h2 style="margin-bottom:15px;">🏆 ${p.toUpperCase()} WINS!</h2><button onclick="location.reload()" style="padding:10px 20px; border-radius:10px; border:none; background:gold; font-weight:bold; cursor:pointer;">New Game</button>`;
+    ws.style.display = 'block';
   }
 </script>
 </body>
