@@ -330,6 +330,7 @@
 </footer>
 
 <script>
+  <script>
   // === THEME LOGIC ===
   const themeToggle = document.getElementById('theme-toggle');
   let isDarkMode = false;
@@ -345,6 +346,36 @@
     }
   });
 
+  // === AUDIO SYSTEM (No external files needed!) ===
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  
+  function playSound(type) {
+    if(audioCtx.state === 'suspended') audioCtx.resume();
+    const osc = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+    
+    osc.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    
+    if(type === 'eat') {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.1);
+      gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.1);
+    } else if (type === 'die') {
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 0.5);
+      gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.5);
+    }
+  }
+
   // === GAME ENGINE ===
   const canvas = document.getElementById('gameCanvas');
   const ctx = canvas.getContext('2d');
@@ -355,12 +386,16 @@
   let snake = [];
   let dx = 0;
   let dy = 0;
+  let nextDx = 0; // For smoother input handling
+  let nextDy = 0; // For smoother input handling
   let foodX;
   let foodY;
   let score = 0;
   let highScore = localStorage.getItem('snakeHighScore') || 0;
   let gameLoop;
-  let gameSpeed = 120; // Lower is faster
+  
+  // SPEED CONTROL: Increased value makes it slower and smoother to control
+  let gameSpeed = 160; 
   let isPlaying = false;
 
   document.getElementById('high-score').innerText = highScore;
@@ -392,11 +427,11 @@
     let diffX = endX - startX;
     let diffY = endY - startY;
     if (Math.abs(diffX) > Math.abs(diffY)) {
-      if (diffX > 30) setDirection(1, 0); // Right
-      else if (diffX < -30) setDirection(-1, 0); // Left
+      if (diffX > 30) setDirection(1, 0);
+      else if (diffX < -30) setDirection(-1, 0);
     } else {
-      if (diffY > 30) setDirection(0, 1); // Down
-      else if (diffY < -30) setDirection(0, -1); // Up
+      if (diffY > 30) setDirection(0, 1);
+      else if (diffY < -30) setDirection(0, -1);
     }
   }
 
@@ -405,21 +440,24 @@
     const W = 87; const A = 65; const S = 83; const D = 68;
     const keyPressed = event.keyCode;
 
-    if ((keyPressed === LEFT_KEY || keyPressed === A) && dx !== 1) setDirection(-1, 0);
-    if ((keyPressed === UP_KEY || keyPressed === W) && dy !== 1) setDirection(0, -1);
-    if ((keyPressed === RIGHT_KEY || keyPressed === D) && dx !== -1) setDirection(1, 0);
-    if ((keyPressed === DOWN_KEY || keyPressed === S) && dy !== -1) setDirection(0, 1);
+    if ((keyPressed === LEFT_KEY || keyPressed === A)) setDirection(-1, 0);
+    if ((keyPressed === UP_KEY || keyPressed === W)) setDirection(0, -1);
+    if ((keyPressed === RIGHT_KEY || keyPressed === D)) setDirection(1, 0);
+    if ((keyPressed === DOWN_KEY || keyPressed === S)) setDirection(0, 1);
   }
 
   function setDirection(newDx, newDy) {
-    // Prevent immediate reverse
-    if (dx === 0 && dy === 0) { dx = newDx; dy = newDy; return; }
+    // Prevent immediate reverse and store next move for smooth cornering
+    if (dx === 0 && dy === 0) { nextDx = newDx; nextDy = newDy; return; }
     if (newDx !== 0 && dx === -newDx) return;
     if (newDy !== 0 && dy === -newDy) return;
-    dx = newDx; dy = newDy;
+    nextDx = newDx; nextDy = newDy;
   }
 
   function startGame() {
+    // Resume audio context on first user interaction
+    if(audioCtx.state === 'suspended') audioCtx.resume();
+
     document.getElementById('start-screen').classList.remove('active');
     document.getElementById('start-screen').classList.add('hidden-scale');
     document.getElementById('game-area').classList.add('active');
@@ -431,9 +469,10 @@
       {x: 10, y: 12}
     ];
     dx = 0; dy = -1;
+    nextDx = 0; nextDy = -1;
     score = 0;
     document.getElementById('score').innerText = score;
-    gameSpeed = 120;
+    gameSpeed = 160; // Starting speed (slower)
     spawnFood();
     isPlaying = true;
     gameLoop = setTimeout(main, gameSpeed);
@@ -451,6 +490,10 @@
       return;
     }
     
+    // Apply queued direction (fixes clunky fast turns)
+    dx = nextDx;
+    dy = nextDy;
+
     clearCanvas();
     drawGrid();
     drawFood();
@@ -480,7 +523,6 @@
     const bodyColor = rootStyles.getPropertyValue('--snake-body').trim();
 
     snake.forEach((part, index) => {
-      // Glow effect for monster mode
       ctx.shadowBlur = isDarkMode ? 10 : 0;
       ctx.shadowColor = headColor;
       
@@ -488,29 +530,27 @@
       ctx.strokeStyle = "rgba(0,0,0,0.2)";
       ctx.lineWidth = 2;
       
-      // Draw rounded rects for smooth look
       ctx.beginPath();
-      ctx.roundRect(part.x * gridSize + 1, part.y * gridSize + 1, gridSize - 2, gridSize - 2, 5);
+      // Made the snake slightly more rounded for a smoother look
+      ctx.roundRect(part.x * gridSize + 1, part.y * gridSize + 1, gridSize - 2, gridSize - 2, 6);
       ctx.fill();
-      ctx.shadowBlur = 0; // reset
+      ctx.shadowBlur = 0;
     });
-
-    // Draw Eyes on Head
-    if(index = 0) { /* Eyes logic could be added here */ }
   }
 
   function advanceSnake() {
     const head = {x: snake[0].x + dx, y: snake[0].y + dy};
-    snake.unshift(head); // Add new head
+    snake.unshift(head);
 
     if (head.x === foodX && head.y === foodY) {
       score += 10;
       document.getElementById('score').innerText = score;
       
-      // Increase speed slightly
-      if (gameSpeed > 50) gameSpeed -= 2; 
+      playSound('eat'); // PLAY EAT SOUND
+      
+      // Speed up slowly to maintain smoothness
+      if (gameSpeed > 70) gameSpeed -= 1.5; 
 
-      // High Score logic real-time
       if (score > highScore) {
         highScore = score;
         document.getElementById('high-score').innerText = highScore;
@@ -518,7 +558,7 @@
       }
       spawnFood();
     } else {
-      snake.pop(); // Remove tail if no food eaten
+      snake.pop();
     }
   }
 
@@ -526,7 +566,6 @@
     foodX = Math.floor(Math.random() * tileCount);
     foodY = Math.floor(Math.random() * tileCount);
     
-    // Ensure food doesn't spawn on snake
     snake.forEach(part => {
       if (part.x === foodX && part.y === foodY) spawnFood();
     });
@@ -539,13 +578,11 @@
     ctx.shadowBlur = 15;
     ctx.shadowColor = ctx.fillStyle;
     
-    // Draw Apple
     ctx.beginPath();
     ctx.arc(foodX * gridSize + gridSize/2, foodY * gridSize + gridSize/2, gridSize/2.5, 0, 2*Math.PI);
     ctx.fill();
     ctx.shadowBlur = 0;
 
-    // Apple Leaf
     ctx.fillStyle = "#22c55e";
     ctx.beginPath();
     ctx.ellipse(foodX * gridSize + gridSize/2 + 3, foodY * gridSize + gridSize/2 - 6, 4, 2, Math.PI/4, 0, 2*Math.PI);
@@ -553,10 +590,7 @@
   }
 
   function hasGameEnded() {
-    // Wall Collision
     if (snake[0].x < 0 || snake[0].x >= tileCount || snake[0].y < 0 || snake[0].y >= tileCount) return true;
-    
-    // Self Collision
     for (let i = 4; i < snake.length; i++) {
       if (snake[i].x === snake[0].x && snake[i].y === snake[0].y) return true;
     }
@@ -565,6 +599,8 @@
 
   function handleGameOver() {
     isPlaying = false;
+    playSound('die'); // PLAY GAME OVER SOUND
+    
     document.getElementById('game-area').classList.remove('active');
     
     let gameOverScreen = document.getElementById('game-over-screen');
@@ -572,22 +608,19 @@
     gameOverScreen.classList.add('active');
     
     document.getElementById('final-score').innerText = score;
-
     updateLeaderboard(score);
   }
 
   function updateLeaderboard(newScore) {
     let leaderboard = JSON.parse(localStorage.getItem('snakeLeaderboard')) || [];
     
-    // Save new score
     if(newScore > 0) {
       leaderboard.push({ date: new Date().toLocaleDateString(), score: newScore });
       leaderboard.sort((a, b) => b.score - a.score);
-      leaderboard = leaderboard.slice(0, 5); // Keep top 5
+      leaderboard = leaderboard.slice(0, 5);
       localStorage.setItem('snakeLeaderboard', JSON.stringify(leaderboard));
     }
 
-    // Display Leaderboard
     const listUI = document.getElementById('leaderboard-list');
     listUI.innerHTML = '';
     
@@ -601,6 +634,7 @@
       });
     }
   }
+</script>
 
 </script>
 </body>
