@@ -224,8 +224,8 @@
     </div>
   </div>
 </div>
-
-<script>
+  
+  <script>
   // === THEME & UI LOGIC ===
   function setTheme(themeName) {
     if(themeName === '') document.body.removeAttribute('data-theme');
@@ -243,7 +243,6 @@
   }
 
   // === CUSTOM AUDIO INTEGRATION ===
-  // Yeh file aapko GitHub par upload karni hongi
   const eatSound = new Audio('eat.mp3');
   const dieSound = new Audio('die.mp3');
 
@@ -333,22 +332,20 @@
 
   function drawSnake() {
     const rootStyles = getComputedStyle(document.body);
-    const headColor = rootStyles.getPropertyValue('--snake-head').trim();
-    const bodyColor = rootStyles.getPropertyValue('--snake-body').trim();
+    const headColor = rootStyles.getPropertyValue('--snake-head').trim() || "#0369a1";
+    const bodyColor = rootStyles.getPropertyValue('--snake-body').trim() || "#38bdf8";
 
     snake.forEach((part, index) => {
-      // 3D Texture Effect using Radial Gradient (Makes it look round and scaly)
       let x = part.x * gridSize + gridSize/2;
       let y = part.y * gridSize + gridSize/2;
       
       let gradient = ctx.createRadialGradient(x - 2, y - 2, 2, x, y, gridSize);
-      gradient.addColorStop(0, index === 0 ? "#ffffff" : headColor); // Highlight
-      gradient.addColorStop(0.4, index === 0 ? headColor : bodyColor); // Main color
-      gradient.addColorStop(1, "rgba(0,0,0,0.6)"); // Shadow edges
+      gradient.addColorStop(0, index === 0 ? "#ffffff" : headColor); 
+      gradient.addColorStop(0.4, index === 0 ? headColor : bodyColor); 
+      gradient.addColorStop(1, "rgba(0,0,0,0.6)"); 
 
       ctx.fillStyle = gradient;
       ctx.beginPath();
-      // Drawing circles instead of boxes for that caterpillar/real snake look!
       ctx.arc(x, y, gridSize/2 - 1, 0, 2*Math.PI);
       ctx.fill();
     });
@@ -375,9 +372,14 @@
   }
 
   function drawFood() {
+    const rootStyles = getComputedStyle(document.body);
+    const appleColor = rootStyles.getPropertyValue('--apple-color').trim() || "#ef4444";
+
     let x = foodX * gridSize + gridSize/2; let y = foodY * gridSize + gridSize/2;
     let grad = ctx.createRadialGradient(x-3, y-3, 1, x, y, gridSize/2);
-    grad.addColorStop(0, "#ff9999"); grad.addColorStop(0.6, "var(--apple-color)"); grad.addColorStop(1, "#8b0000");
+    grad.addColorStop(0, "#ff9999"); 
+    grad.addColorStop(0.6, appleColor); // Yahi mistake thi jo ab fix ho gayi hai!
+    grad.addColorStop(1, "#8b0000");
     
     ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(x, y, gridSize/2 - 2, 0, 2*Math.PI); ctx.fill();
     ctx.fillStyle = "#22c55e"; ctx.beginPath(); ctx.ellipse(x+3, y-7, 4, 2, Math.PI/4, 0, 2*Math.PI); ctx.fill();
