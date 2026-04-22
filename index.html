@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deepak | Cosmic-Waves Generator</title>
+    <title>Deepak | Cosmic Design Suite</title>
     <style>
         /* CSS Variables for Light & Dark Theme */
         :root {
@@ -16,6 +16,7 @@
             --svg-bg: #e9ecef;
             --code-bg: #1e293b;
             --code-text: #a7f3d0;
+            --tab-inactive: #cbd5e1;
         }
 
         [data-theme="dark"] {
@@ -28,6 +29,7 @@
             --svg-bg: #0b1120;
             --code-bg: #000000;
             --code-text: #34d399;
+            --tab-inactive: #475569;
         }
 
         * {
@@ -35,7 +37,7 @@
             margin: 0;
             padding: 0;
             font-family: 'Segoe UI', system-ui, sans-serif;
-            transition: background-color 0.3s, color 0.3s;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
         }
 
         body {
@@ -91,6 +93,32 @@
             gap: 20px;
         }
 
+        /* Tabs UI */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            background: var(--panel-bg);
+            padding: 10px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            background: var(--tab-inactive);
+            color: var(--text-color);
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
         .panel {
             background: var(--panel-bg);
             padding: 25px;
@@ -100,6 +128,9 @@
         }
 
         h3 { margin-bottom: 15px; font-size: 1.2rem; }
+
+        .control-section { display: none; }
+        .control-section.active { display: block; }
 
         .control-group {
             display: flex;
@@ -130,7 +161,6 @@
             background: none;
         }
 
-        /* Toggle Switch CSS */
         .switch {
             position: relative;
             display: inline-block;
@@ -160,15 +190,6 @@
         input:checked + .slider { background-color: var(--primary); }
         input:checked + .slider:before { transform: translateX(26px); }
 
-        .info-box {
-            font-size: 0.85rem;
-            line-height: 1.5;
-            color: var(--text-color);
-            opacity: 0.8;
-        }
-        .info-box ul { padding-left: 20px; margin-top: 10px; }
-        .info-box li { margin-bottom: 5px; }
-
         .main-content {
             flex-grow: 1;
             display: flex;
@@ -178,16 +199,21 @@
 
         .preview-box {
             width: 100%;
+            height: 400px;
             background: var(--svg-bg);
             border-radius: 12px;
             border: 1px solid var(--border-color);
-            overflow: hidden;
             display: flex;
             align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background-image: radial-gradient(var(--border-color) 1px, transparent 1px);
+            background-size: 20px 20px;
         }
 
         #preview-svg {
             width: 100%;
+            height: 100%;
             display: block;
         }
 
@@ -217,7 +243,6 @@
             margin-top: 10px;
             width: 100%;
         }
-
         button.copy-btn:hover { background: var(--primary-hover); }
 
         footer {
@@ -228,69 +253,89 @@
             font-size: 0.9rem;
             margin-top: auto;
         }
+        
+        .generate-btn {
+            background: #ec4899;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="logo">Deepak | Cosmic-Waves</div>
+        <div class="logo">Deepak | Cosmic Design Suite</div>
         <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌙 Dark Mode</button>
     </header>
 
     <div class="container">
         <div class="sidebar">
-            <div class="panel">
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('waves')">🌊 Waves</button>
+                <button class="tab-btn" onclick="switchTab('blobs')">💧 Blobs</button>
+            </div>
+
+            <div class="panel control-section active" id="waves-controls">
                 <h3>Wave Controls</h3>
-                
                 <div class="control-group row-group">
-                    <label>Animated Waves</label>
+                    <label>Animated</label>
                     <label class="switch">
                         <input type="checkbox" id="isAnimated" checked>
                         <span class="slider"></span>
                     </label>
                 </div>
-
                 <div class="control-group" id="speedControlBox">
-                    <label for="animSpeed">Animation Speed (Seconds)</label>
+                    <label>Speed</label>
                     <input type="range" id="animSpeed" min="2" max="20" value="8" style="direction: rtl;">
                 </div>
-
                 <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 10px 0;">
-
                 <div class="control-group">
-                    <label for="waveCount">Complexity (Peaks)</label>
+                    <label>Complexity</label>
                     <input type="range" id="waveCount" min="1" max="10" value="3">
                 </div>
-
                 <div class="control-group">
-                    <label for="waveHeight">Height (Amplitude)</label>
+                    <label>Height</label>
                     <input type="range" id="waveHeight" min="10" max="150" value="80">
                 </div>
-
                 <div class="control-group">
-                    <label for="waveColor">Base Color</label>
+                    <label>Color</label>
                     <input type="color" id="waveColor" value="#ec4899">
                 </div>
             </div>
 
-            <div class="panel info-box">
-                <h3>💡 Pro Tips & Knowledge</h3>
-                <ul>
-                    <li><b>No JS Required:</b> This tool uses native SVG <code>&lt;animateTransform&gt;</code>. Users don't need CSS or JS to make it move on their site!</li>
-                    <li><b>Seamless Loop:</b> The generator creates a wave twice as wide (200%) and pans it infinitely for a smooth liquid effect.</li>
-                    <li><b>Parallax Effect:</b> The 3 layers move at slightly different speeds, creating a 3D depth illusion.</li>
-                </ul>
+            <div class="panel control-section" id="blobs-controls">
+                <h3>Blob Controls</h3>
+                <div class="control-group">
+                    <label>Complexity (Points)</label>
+                    <input type="range" id="blobPoints" min="4" max="12" value="6">
+                </div>
+                <div class="control-group">
+                    <label>Randomness (Weirdness)</label>
+                    <input type="range" id="blobRandomness" min="10" max="100" value="40">
+                </div>
+                <div class="control-group">
+                    <label>Color</label>
+                    <input type="color" id="blobColor" value="#818cf8">
+                </div>
+                <button class="generate-btn" onclick="updateBlob()">🎲 Generate Random Shape</button>
             </div>
         </div>
 
         <div class="main-content">
             <div class="panel">
-                <h3>Live Preview</h3>
-                <div class="preview-box" id="preview-svg"></div>
+                <h3 id="preview-title">Live Preview</h3>
+                <div class="preview-box" id="preview-container">
+                    </div>
             </div>
 
             <div class="panel">
-                <h3>Generated SVG Code (Copy & Paste Ready)</h3>
+                <h3>Generated SVG Code</h3>
                 <textarea id="code-output" readonly></textarea>
                 <button class="copy-btn" onclick="copyCode()">📋 Copy Code to Clipboard</button>
             </div>
@@ -298,10 +343,12 @@
     </div>
 
     <footer>
-        <p>Created by <strong>Deepak</strong> | Cosmic-Waves Generator &copy; 2026. Built for Designers & Developers.</p>
+        <p>Created by <strong>Deepak</strong> | Cosmic Design Suite &copy; 2026. Built for Designers.</p>
     </footer>
 
     <script>
+        let currentMode = 'waves';
+
         function toggleTheme() {
             const body = document.documentElement;
             const themeBtn = document.getElementById('themeBtn');
@@ -314,22 +361,37 @@
             }
         }
 
+        function switchTab(mode) {
+            currentMode = mode;
+            
+            // UI Toggle
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.control-section').forEach(sec => sec.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(mode + '-controls').classList.add('active');
+            
+            if(mode === 'waves') {
+                document.getElementById('preview-title').innerText = "Live Preview - Cosmic Waves";
+                updateWave();
+            } else {
+                document.getElementById('preview-title').innerText = "Live Preview - Organic Blob";
+                updateBlob();
+            }
+        }
+
+        // ================= WAVES LOGIC =================
         const waveCountInput = document.getElementById('waveCount');
         const waveHeightInput = document.getElementById('waveHeight');
         const waveColorInput = document.getElementById('waveColor');
         const isAnimatedInput = document.getElementById('isAnimated');
         const animSpeedInput = document.getElementById('animSpeed');
         const speedControlBox = document.getElementById('speedControlBox');
-        const previewSvg = document.getElementById('preview-svg');
-        const codeOutput = document.getElementById('code-output');
 
-        // Logic to generate a seamless repeating path
-        function generatePath(count, amplitude, width, height, baseline, offsetMultiplier) {
-            // Make the path TWICE as long so we can slide it left for animation
+        function generateWavePath(count, amplitude, width, height, baseline, offsetMultiplier) {
             const totalCount = count * 2; 
             const totalWidth = width * 2;
             const segmentWidth = totalWidth / totalCount;
-            
             let pathD = `M 0 ${height} L 0 ${baseline} `;
             
             for (let i = 1; i <= totalCount; i++) {
@@ -339,12 +401,12 @@
                 let cy = baseline + (i % 2 === 0 ? currentAmplitude : -currentAmplitude);
                 pathD += `Q ${cx} ${cy}, ${x} ${baseline} `;
             }
-            
             pathD += `L ${totalWidth} ${height} L 0 ${height} Z`;
             return pathD;
         }
 
         function updateWave() {
+            if(currentMode !== 'waves') return;
             const count = parseInt(waveCountInput.value);
             const amplitude = parseInt(waveHeightInput.value);
             const color = waveColorInput.value;
@@ -355,57 +417,92 @@
             animSpeedInput.disabled = !isAnimated;
 
             const width = 1200;
-            const height = 300;
-            const baseline = 200;
+            const height = 400; // Increased height to match blob area
+            const baseline = 250;
 
-            const path1 = generatePath(count, amplitude, width, height, baseline, 0.5); // Back
-            const path2 = generatePath(count, amplitude, width, height, baseline, 0.7); // Middle
-            const path3 = generatePath(count, amplitude, width, height, baseline, 1.0); // Front
+            const path1 = generateWavePath(count, amplitude, width, height, baseline, 0.5);
+            const path2 = generateWavePath(count, amplitude, width, height, baseline, 0.7);
+            const path3 = generateWavePath(count, amplitude, width, height, baseline, 1.0);
 
-            let svgCode = `<svg viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">\n`;
-
+            let svgCode = `<svg viewBox="0 0 ${width} ${height}" style="width:100%; height:100%;" xmlns="http://www.w3.org/2000/svg">\n`;
             if (isAnimated) {
-                // Different durations for parallax depth effect
-                const dur1 = speed * 1.5;
-                const dur2 = speed * 1.2;
-                const dur3 = speed;
-
-                svgCode += `  <g>
-    <animateTransform attributeName="transform" type="translate" from="0 0" to="-${width} 0" dur="${dur1}s" repeatCount="indefinite" />
-    <path fill="${color}" fill-opacity="0.3" d="${path1}"></path>
-  </g>
-  <g>
-    <animateTransform attributeName="transform" type="translate" from="0 0" to="-${width} 0" dur="${dur2}s" repeatCount="indefinite" />
-    <path fill="${color}" fill-opacity="0.6" d="${path2}"></path>
-  </g>
-  <g>
-    <animateTransform attributeName="transform" type="translate" from="0 0" to="-${width} 0" dur="${dur3}s" repeatCount="indefinite" />
-    <path fill="${color}" fill-opacity="1" d="${path3}"></path>
-  </g>\n`;
+                svgCode += `  <g><animateTransform attributeName="transform" type="translate" from="0 0" to="-${width} 0" dur="${speed * 1.5}s" repeatCount="indefinite" /><path fill="${color}" fill-opacity="0.3" d="${path1}"></path></g>\n`;
+                svgCode += `  <g><animateTransform attributeName="transform" type="translate" from="0 0" to="-${width} 0" dur="${speed * 1.2}s" repeatCount="indefinite" /><path fill="${color}" fill-opacity="0.6" d="${path2}"></path></g>\n`;
+                svgCode += `  <g><animateTransform attributeName="transform" type="translate" from="0 0" to="-${width} 0" dur="${speed}s" repeatCount="indefinite" /><path fill="${color}" fill-opacity="1" d="${path3}"></path></g>\n`;
             } else {
-                svgCode += `  <path fill="${color}" fill-opacity="0.3" d="${path1}"></path>
-  <path fill="${color}" fill-opacity="0.6" d="${path2}"></path>
-  <path fill="${color}" fill-opacity="1" d="${path3}"></path>\n`;
+                svgCode += `  <path fill="${color}" fill-opacity="0.3" d="${path1}"></path>\n  <path fill="${color}" fill-opacity="0.6" d="${path2}"></path>\n  <path fill="${color}" fill-opacity="1" d="${path3}"></path>\n`;
             }
-
             svgCode += `</svg>`;
             
-            previewSvg.innerHTML = svgCode;
-            codeOutput.value = svgCode;
+            document.getElementById('preview-container').innerHTML = svgCode;
+            document.getElementById('code-output').value = svgCode;
+        }
+
+        // ================= BLOB LOGIC =================
+        const blobPointsInput = document.getElementById('blobPoints');
+        const blobRandomnessInput = document.getElementById('blobRandomness');
+        const blobColorInput = document.getElementById('blobColor');
+
+        function updateBlob() {
+            if(currentMode !== 'blobs') return;
+            const numPoints = parseInt(blobPointsInput.value);
+            const variance = parseInt(blobRandomnessInput.value);
+            const color = blobColorInput.value;
+            
+            const size = 400;
+            const center = size / 2;
+            const baseRadius = 120;
+            const points = [];
+            const angleStep = (Math.PI * 2) / numPoints;
+
+            // Generate random points in a circle
+            for (let i = 0; i < numPoints; i++) {
+                const angle = i * angleStep;
+                const r = baseRadius + (Math.random() * variance - variance/2);
+                points.push({
+                    x: center + r * Math.cos(angle),
+                    y: center + r * Math.sin(angle)
+                });
+            }
+
+            // Smooth the points using Midpoint Quadratic Curves
+            let d = `M ${(points[0].x + points[points.length-1].x) / 2},${(points[0].y + points[points.length-1].y) / 2} `;
+            for(let i = 0; i < points.length; i++) {
+                let p1 = points[i];
+                let p2 = points[(i + 1) % points.length];
+                let midX = (p1.x + p2.x) / 2;
+                let midY = (p1.y + p2.y) / 2;
+                d += `Q ${p1.x},${p1.y} ${midX},${midY} `;
+            }
+
+            const svgCode = `<svg viewBox="0 0 ${size} ${size}" style="width:100%; height:100%;" xmlns="http://www.w3.org/2000/svg">
+  <path fill="${color}" d="${d}"></path>
+</svg>`;
+            
+            document.getElementById('preview-container').innerHTML = svgCode;
+            document.getElementById('code-output').value = svgCode;
         }
 
         function copyCode() {
+            const codeOutput = document.getElementById('code-output');
             codeOutput.select();
             document.execCommand('copy');
-            alert("Animated Cosmic Waves code copied! 🚀 Go paste it in your HTML.");
+            alert(`Code copied! 🚀 Ready to use in your project.`);
         }
 
+        // Event Listeners for Waves
         waveCountInput.addEventListener('input', updateWave);
         waveHeightInput.addEventListener('input', updateWave);
         waveColorInput.addEventListener('input', updateWave);
         isAnimatedInput.addEventListener('change', updateWave);
         animSpeedInput.addEventListener('input', updateWave);
 
+        // Event Listeners for Blobs
+        blobPointsInput.addEventListener('input', updateBlob);
+        blobRandomnessInput.addEventListener('input', updateBlob);
+        blobColorInput.addEventListener('input', updateBlob);
+
+        // Initial setup
         updateWave();
     </script>
 </body>
