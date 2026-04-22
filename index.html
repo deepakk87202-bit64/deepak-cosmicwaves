@@ -46,7 +46,6 @@
             min-height: 100vh;
         }
 
-        /* Header */
         header {
             background-color: var(--panel-bg);
             padding: 15px 40px;
@@ -75,7 +74,6 @@
             color: var(--text-color);
         }
 
-        /* Main Layout */
         .container {
             display: flex;
             flex-grow: 1;
@@ -86,7 +84,6 @@
             width: 100%;
         }
 
-        /* Sidebar */
         .sidebar {
             width: 350px;
             display: flex;
@@ -111,6 +108,12 @@
             margin-bottom: 15px;
         }
 
+        .row-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
         label { font-size: 0.9rem; font-weight: 600; }
         
         input[type="range"] {
@@ -127,7 +130,36 @@
             background: none;
         }
 
-        /* Info Box */
+        /* Toggle Switch CSS */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider { background-color: var(--primary); }
+        input:checked + .slider:before { transform: translateX(26px); }
+
         .info-box {
             font-size: 0.85rem;
             line-height: 1.5;
@@ -137,7 +169,6 @@
         .info-box ul { padding-left: 20px; margin-top: 10px; }
         .info-box li { margin-bottom: 5px; }
 
-        /* Main Content */
         .main-content {
             flex-grow: 1;
             display: flex;
@@ -170,7 +201,8 @@
             color: var(--code-text);
             font-family: 'Courier New', Courier, monospace;
             resize: none;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
+            white-space: pre;
         }
 
         button.copy-btn {
@@ -188,7 +220,6 @@
 
         button.copy-btn:hover { background: var(--primary-hover); }
 
-        /* Footer */
         footer {
             text-align: center;
             padding: 20px;
@@ -211,9 +242,24 @@
             <div class="panel">
                 <h3>Wave Controls</h3>
                 
+                <div class="control-group row-group">
+                    <label>Animated Waves</label>
+                    <label class="switch">
+                        <input type="checkbox" id="isAnimated" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="control-group" id="speedControlBox">
+                    <label for="animSpeed">Animation Speed (Seconds)</label>
+                    <input type="range" id="animSpeed" min="2" max="20" value="8" style="direction: rtl;">
+                </div>
+
+                <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 10px 0;">
+
                 <div class="control-group">
                     <label for="waveCount">Complexity (Peaks)</label>
-                    <input type="range" id="waveCount" min="1" max="10" value="4">
+                    <input type="range" id="waveCount" min="1" max="10" value="3">
                 </div>
 
                 <div class="control-group">
@@ -223,31 +269,28 @@
 
                 <div class="control-group">
                     <label for="waveColor">Base Color</label>
-                    <input type="color" id="waveColor" value="#6366f1">
+                    <input type="color" id="waveColor" value="#ec4899">
                 </div>
             </div>
 
             <div class="panel info-box">
                 <h3>💡 Pro Tips & Knowledge</h3>
-                <p>Welcome to Cosmic-Waves! Here is how professionals use this tool:</p>
                 <ul>
-                    <li><b>Tech Stack:</b> HTML5, CSS3, Vanilla JS. Math relies on Quadratic Bezier Curves (Q).</li>
-                    <li><b>Color Sense:</b> Use dark blues/purples (#0f172a) for a deep space cosmic vibe. Use vibrant gradients for modern SaaS platforms.</li>
-                    <li><b>Multiple Layers:</b> This generator automatically creates 3 layers of waves with 30%, 60%, and 100% opacity for a premium 3D look.</li>
-                    <li><b>Usage:</b> Perfect for Hero section dividers or Footer backgrounds.</li>
+                    <li><b>No JS Required:</b> This tool uses native SVG <code>&lt;animateTransform&gt;</code>. Users don't need CSS or JS to make it move on their site!</li>
+                    <li><b>Seamless Loop:</b> The generator creates a wave twice as wide (200%) and pans it infinitely for a smooth liquid effect.</li>
+                    <li><b>Parallax Effect:</b> The 3 layers move at slightly different speeds, creating a 3D depth illusion.</li>
                 </ul>
             </div>
         </div>
 
         <div class="main-content">
             <div class="panel">
-                <h3>Live Preview (Multi-Layered)</h3>
-                <div class="preview-box" id="preview-svg">
-                    </div>
+                <h3>Live Preview</h3>
+                <div class="preview-box" id="preview-svg"></div>
             </div>
 
             <div class="panel">
-                <h3>Generated SVG Code</h3>
+                <h3>Generated SVG Code (Copy & Paste Ready)</h3>
                 <textarea id="code-output" readonly></textarea>
                 <button class="copy-btn" onclick="copyCode()">📋 Copy Code to Clipboard</button>
             </div>
@@ -259,7 +302,6 @@
     </footer>
 
     <script>
-        // Dark Mode Logic
         function toggleTheme() {
             const body = document.documentElement;
             const themeBtn = document.getElementById('themeBtn');
@@ -272,28 +314,33 @@
             }
         }
 
-        // SVG Generation Logic
         const waveCountInput = document.getElementById('waveCount');
         const waveHeightInput = document.getElementById('waveHeight');
         const waveColorInput = document.getElementById('waveColor');
+        const isAnimatedInput = document.getElementById('isAnimated');
+        const animSpeedInput = document.getElementById('animSpeed');
+        const speedControlBox = document.getElementById('speedControlBox');
         const previewSvg = document.getElementById('preview-svg');
         const codeOutput = document.getElementById('code-output');
 
+        // Logic to generate a seamless repeating path
         function generatePath(count, amplitude, width, height, baseline, offsetMultiplier) {
-            const segmentWidth = width / count;
+            // Make the path TWICE as long so we can slide it left for animation
+            const totalCount = count * 2; 
+            const totalWidth = width * 2;
+            const segmentWidth = totalWidth / totalCount;
+            
             let pathD = `M 0 ${height} L 0 ${baseline} `;
             
-            for (let i = 1; i <= count; i++) {
+            for (let i = 1; i <= totalCount; i++) {
                 let x = i * segmentWidth;
                 let cx = x - (segmentWidth / 2);
-                
-                // Add an offset to amplitude for background layers to make them look different
                 let currentAmplitude = amplitude * offsetMultiplier;
                 let cy = baseline + (i % 2 === 0 ? currentAmplitude : -currentAmplitude);
-                
                 pathD += `Q ${cx} ${cy}, ${x} ${baseline} `;
             }
-            pathD += `L ${width} ${height} Z`;
+            
+            pathD += `L ${totalWidth} ${height} L 0 ${height} Z`;
             return pathD;
         }
 
@@ -301,21 +348,47 @@
             const count = parseInt(waveCountInput.value);
             const amplitude = parseInt(waveHeightInput.value);
             const color = waveColorInput.value;
+            const isAnimated = isAnimatedInput.checked;
+            const speed = parseInt(animSpeedInput.value);
             
+            speedControlBox.style.opacity = isAnimated ? "1" : "0.4";
+            animSpeedInput.disabled = !isAnimated;
+
             const width = 1200;
             const height = 300;
-            const baseline = 180;
+            const baseline = 200;
 
-            // Generate 3 layers for a premium look
-            const path1 = generatePath(count, amplitude, width, height, baseline, 0.6); // Back layer
-            const path2 = generatePath(count, amplitude, width, height, baseline, 0.8); // Middle layer
-            const path3 = generatePath(count, amplitude, width, height, baseline, 1.0); // Front layer
+            const path1 = generatePath(count, amplitude, width, height, baseline, 0.5); // Back
+            const path2 = generatePath(count, amplitude, width, height, baseline, 0.7); // Middle
+            const path3 = generatePath(count, amplitude, width, height, baseline, 1.0); // Front
 
-            const svgCode = `<svg viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
-  <path fill="${color}" fill-opacity="0.3" d="${path1}"></path>
+            let svgCode = `<svg viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">\n`;
+
+            if (isAnimated) {
+                // Different durations for parallax depth effect
+                const dur1 = speed * 1.5;
+                const dur2 = speed * 1.2;
+                const dur3 = speed;
+
+                svgCode += `  <g>
+    <animateTransform attributeName="transform" type="translate" from="0 0" to="-${width} 0" dur="${dur1}s" repeatCount="indefinite" />
+    <path fill="${color}" fill-opacity="0.3" d="${path1}"></path>
+  </g>
+  <g>
+    <animateTransform attributeName="transform" type="translate" from="0 0" to="-${width} 0" dur="${dur2}s" repeatCount="indefinite" />
+    <path fill="${color}" fill-opacity="0.6" d="${path2}"></path>
+  </g>
+  <g>
+    <animateTransform attributeName="transform" type="translate" from="0 0" to="-${width} 0" dur="${dur3}s" repeatCount="indefinite" />
+    <path fill="${color}" fill-opacity="1" d="${path3}"></path>
+  </g>\n`;
+            } else {
+                svgCode += `  <path fill="${color}" fill-opacity="0.3" d="${path1}"></path>
   <path fill="${color}" fill-opacity="0.6" d="${path2}"></path>
-  <path fill="${color}" fill-opacity="1" d="${path3}"></path>
-</svg>`;
+  <path fill="${color}" fill-opacity="1" d="${path3}"></path>\n`;
+            }
+
+            svgCode += `</svg>`;
             
             previewSvg.innerHTML = svgCode;
             codeOutput.value = svgCode;
@@ -324,14 +397,15 @@
         function copyCode() {
             codeOutput.select();
             document.execCommand('copy');
-            alert("Cosmic Waves code copied! 🚀 Ready to use.");
+            alert("Animated Cosmic Waves code copied! 🚀 Go paste it in your HTML.");
         }
 
         waveCountInput.addEventListener('input', updateWave);
         waveHeightInput.addEventListener('input', updateWave);
         waveColorInput.addEventListener('input', updateWave);
+        isAnimatedInput.addEventListener('change', updateWave);
+        animSpeedInput.addEventListener('input', updateWave);
 
-        // Initial setup
         updateWave();
     </script>
 </body>
