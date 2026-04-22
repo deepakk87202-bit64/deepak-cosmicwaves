@@ -3,202 +3,335 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SVG Wave Generator - Micro Tool</title>
+    <title>Deepak | Cosmic-Waves Generator</title>
     <style>
+        /* CSS Variables for Light & Dark Theme */
+        :root {
+            --bg-color: #f0f4f8;
+            --text-color: #1e293b;
+            --panel-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --svg-bg: #e9ecef;
+            --code-bg: #1e293b;
+            --code-text: #a7f3d0;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #0f172a;
+            --text-color: #f8fafc;
+            --panel-bg: #1e293b;
+            --border-color: #334155;
+            --primary: #818cf8;
+            --primary-hover: #6366f1;
+            --svg-bg: #0b1120;
+            --code-bg: #000000;
+            --code-text: #34d399;
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            transition: background-color 0.3s, color 0.3s;
         }
+
         body {
-            background-color: #f4f7f6;
-            color: #333;
-            display: flex;
-            height: 100vh;
-        }
-        .sidebar {
-            width: 300px;
-            background: #fff;
-            padding: 20px;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            background-color: var(--bg-color);
+            color: var(--text-color);
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            min-height: 100vh;
         }
-        .main-content {
-            flex-grow: 1;
-            padding: 40px;
+
+        /* Header */
+        header {
+            background-color: var(--panel-bg);
+            padding: 15px 40px;
             display: flex;
-            flex-direction: column;
-            gap: 20px;
+            justify-content: space-between;
             align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
-        h2 {
+
+        .logo {
             font-size: 1.5rem;
-            color: #2c3e50;
-            margin-bottom: 10px;
+            font-weight: 800;
+            background: linear-gradient(45deg, var(--primary), #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
+
+        .theme-toggle {
+            background: var(--border-color);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--text-color);
+        }
+
+        /* Main Layout */
+        .container {
+            display: flex;
+            flex-grow: 1;
+            padding: 20px;
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 350px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .panel {
+            background: var(--panel-bg);
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        }
+
+        h3 { margin-bottom: 15px; font-size: 1.2rem; }
+
         .control-group {
             display: flex;
             flex-direction: column;
             gap: 8px;
+            margin-bottom: 15px;
         }
-        label {
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
+
+        label { font-size: 0.9rem; font-weight: 600; }
+        
         input[type="range"] {
             width: 100%;
-            cursor: pointer;
+            accent-color: var(--primary);
         }
+
         input[type="color"] {
             width: 100%;
             height: 40px;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
+            background: none;
         }
+
+        /* Info Box */
+        .info-box {
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: var(--text-color);
+            opacity: 0.8;
+        }
+        .info-box ul { padding-left: 20px; margin-top: 10px; }
+        .info-box li { margin-bottom: 5px; }
+
+        /* Main Content */
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
         .preview-box {
             width: 100%;
-            max-width: 900px;
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            background: var(--svg-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
             overflow: hidden;
-            border: 1px solid #ddd;
+            display: flex;
+            align-items: center;
         }
-        /* SVG Preview Container */
+
         #preview-svg {
             width: 100%;
             display: block;
-            background-color: #e9ecef; /* Background color of the sky/empty area */
         }
-        .code-section {
-            width: 100%;
-            max-width: 900px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
+
         textarea {
             width: 100%;
-            height: 120px;
+            height: 150px;
             padding: 15px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-            background: #2d2d2d;
-            color: #4CAF50;
-            font-family: monospace;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            background: var(--code-bg);
+            color: var(--code-text);
+            font-family: 'Courier New', Courier, monospace;
             resize: none;
+            font-size: 0.9rem;
         }
-        button {
-            padding: 10px 20px;
-            background: #3498db;
+
+        button.copy-btn {
+            padding: 12px 24px;
+            background: var(--primary);
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             font-weight: bold;
+            font-size: 1rem;
             cursor: pointer;
-            transition: 0.3s;
+            margin-top: 10px;
+            width: 100%;
         }
-        button:hover {
-            background: #2980b9;
+
+        button.copy-btn:hover { background: var(--primary-hover); }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: var(--panel-bg);
+            border-top: 1px solid var(--border-color);
+            font-size: 0.9rem;
+            margin-top: auto;
         }
     </style>
 </head>
 <body>
 
-    <div class="sidebar">
-        <h2>Wave Controls</h2>
-        
-        <div class="control-group">
-            <label for="waveCount">Complexity (Number of Waves)</label>
-            <input type="range" id="waveCount" min="1" max="10" value="4">
-        </div>
+    <header>
+        <div class="logo">Deepak | Cosmic-Waves</div>
+        <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌙 Dark Mode</button>
+    </header>
 
-        <div class="control-group">
-            <label for="waveHeight">Height (Amplitude)</label>
-            <input type="range" id="waveHeight" min="10" max="150" value="80">
-        </div>
+    <div class="container">
+        <div class="sidebar">
+            <div class="panel">
+                <h3>Wave Controls</h3>
+                
+                <div class="control-group">
+                    <label for="waveCount">Complexity (Peaks)</label>
+                    <input type="range" id="waveCount" min="1" max="10" value="4">
+                </div>
 
-        <div class="control-group">
-            <label for="waveColor">Wave Color</label>
-            <input type="color" id="waveColor" value="#3498db">
-        </div>
-    </div>
+                <div class="control-group">
+                    <label for="waveHeight">Height (Amplitude)</label>
+                    <input type="range" id="waveHeight" min="10" max="150" value="80">
+                </div>
 
-    <div class="main-content">
-        <h2>Live Preview</h2>
-        <div class="preview-box" id="preview-svg">
+                <div class="control-group">
+                    <label for="waveColor">Base Color</label>
+                    <input type="color" id="waveColor" value="#6366f1">
+                </div>
             </div>
 
-        <div class="code-section">
-            <h2>Generated SVG Code</h2>
-            <textarea id="code-output" readonly></textarea>
-            <button onclick="copyCode()">Copy Code to Clipboard</button>
+            <div class="panel info-box">
+                <h3>💡 Pro Tips & Knowledge</h3>
+                <p>Welcome to Cosmic-Waves! Here is how professionals use this tool:</p>
+                <ul>
+                    <li><b>Tech Stack:</b> HTML5, CSS3, Vanilla JS. Math relies on Quadratic Bezier Curves (Q).</li>
+                    <li><b>Color Sense:</b> Use dark blues/purples (#0f172a) for a deep space cosmic vibe. Use vibrant gradients for modern SaaS platforms.</li>
+                    <li><b>Multiple Layers:</b> This generator automatically creates 3 layers of waves with 30%, 60%, and 100% opacity for a premium 3D look.</li>
+                    <li><b>Usage:</b> Perfect for Hero section dividers or Footer backgrounds.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="panel">
+                <h3>Live Preview (Multi-Layered)</h3>
+                <div class="preview-box" id="preview-svg">
+                    </div>
+            </div>
+
+            <div class="panel">
+                <h3>Generated SVG Code</h3>
+                <textarea id="code-output" readonly></textarea>
+                <button class="copy-btn" onclick="copyCode()">📋 Copy Code to Clipboard</button>
+            </div>
         </div>
     </div>
 
+    <footer>
+        <p>Created by <strong>Deepak</strong> | Cosmic-Waves Generator &copy; 2026. Built for Designers & Developers.</p>
+    </footer>
+
     <script>
-        // DOM Elements
+        // Dark Mode Logic
+        function toggleTheme() {
+            const body = document.documentElement;
+            const themeBtn = document.getElementById('themeBtn');
+            if (body.getAttribute('data-theme') === 'dark') {
+                body.removeAttribute('data-theme');
+                themeBtn.textContent = '🌙 Dark Mode';
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                themeBtn.textContent = '☀️ Light Mode';
+            }
+        }
+
+        // SVG Generation Logic
         const waveCountInput = document.getElementById('waveCount');
         const waveHeightInput = document.getElementById('waveHeight');
         const waveColorInput = document.getElementById('waveColor');
         const previewSvg = document.getElementById('preview-svg');
         const codeOutput = document.getElementById('code-output');
 
-        // Function to generate and update the wave
+        function generatePath(count, amplitude, width, height, baseline, offsetMultiplier) {
+            const segmentWidth = width / count;
+            let pathD = `M 0 ${height} L 0 ${baseline} `;
+            
+            for (let i = 1; i <= count; i++) {
+                let x = i * segmentWidth;
+                let cx = x - (segmentWidth / 2);
+                
+                // Add an offset to amplitude for background layers to make them look different
+                let currentAmplitude = amplitude * offsetMultiplier;
+                let cy = baseline + (i % 2 === 0 ? currentAmplitude : -currentAmplitude);
+                
+                pathD += `Q ${cx} ${cy}, ${x} ${baseline} `;
+            }
+            pathD += `L ${width} ${height} Z`;
+            return pathD;
+        }
+
         function updateWave() {
             const count = parseInt(waveCountInput.value);
             const amplitude = parseInt(waveHeightInput.value);
             const color = waveColorInput.value;
             
-            const width = 1000;  // SVG ViewBox Width
-            const height = 300;  // SVG ViewBox Height
-            const baseline = 150; // The middle line where waves oscillate
+            const width = 1200;
+            const height = 300;
+            const baseline = 180;
+
+            // Generate 3 layers for a premium look
+            const path1 = generatePath(count, amplitude, width, height, baseline, 0.6); // Back layer
+            const path2 = generatePath(count, amplitude, width, height, baseline, 0.8); // Middle layer
+            const path3 = generatePath(count, amplitude, width, height, baseline, 1.0); // Front layer
+
+            const svgCode = `<svg viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
+  <path fill="${color}" fill-opacity="0.3" d="${path1}"></path>
+  <path fill="${color}" fill-opacity="0.6" d="${path2}"></path>
+  <path fill="${color}" fill-opacity="1" d="${path3}"></path>
+</svg>`;
             
-            const segmentWidth = width / count;
-            
-            // Start path at bottom-left, then draw line up to the baseline
-            let pathD = `M 0 ${height} L 0 ${baseline} `;
-            
-            // Generate Quadratic Bezier Curves for each wave segment
-            for (let i = 1; i <= count; i++) {
-                let x = i * segmentWidth; // End point X of this segment
-                let cx = x - (segmentWidth / 2); // Control point X (middle of segment)
-                
-                // Alternate the control point Y above and below the baseline
-                let cy = baseline + (i % 2 === 0 ? amplitude : -amplitude);
-                
-                // Add curve command: Q controlPointX controlPointY, endPointX endPointY
-                pathD += `Q ${cx} ${cy}, ${x} ${baseline} `;
-            }
-            
-            // Close the path by drawing a line to bottom-right, then back to start (Z)
-            pathD += `L ${width} ${height} Z`;
-            
-            // Build the final SVG string
-            const svgCode = `<svg viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">\n  <path fill="${color}" d="${pathD}"></path>\n</svg>`;
-            
-            // Inject into the DOM
             previewSvg.innerHTML = svgCode;
             codeOutput.value = svgCode;
         }
 
-        // Function to copy code to clipboard
         function copyCode() {
             codeOutput.select();
             document.execCommand('copy');
-            alert("Code copied successfully! Bro, you are ready to paste it.");
+            alert("Cosmic Waves code copied! 🚀 Ready to use.");
         }
 
-        // Event Listeners to update wave on slider change
         waveCountInput.addEventListener('input', updateWave);
         waveHeightInput.addEventListener('input', updateWave);
         waveColorInput.addEventListener('input', updateWave);
 
-        // Initial call to generate the first wave on page load
+        // Initial setup
         updateWave();
     </script>
 </body>
