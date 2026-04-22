@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVG Wave Generator - Micro Tool</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: #f4f7f6;
+            color: #333;
+            display: flex;
+            height: 100vh;
+        }
+        .sidebar {
+            width: 300px;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .main-content {
+            flex-grow: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+        }
+        h2 {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        label {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        input[type="range"] {
+            width: 100%;
+            cursor: pointer;
+        }
+        input[type="color"] {
+            width: 100%;
+            height: 40px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .preview-box {
+            width: 100%;
+            max-width: 900px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            overflow: hidden;
+            border: 1px solid #ddd;
+        }
+        /* SVG Preview Container */
+        #preview-svg {
+            width: 100%;
+            display: block;
+            background-color: #e9ecef; /* Background color of the sky/empty area */
+        }
+        .code-section {
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        textarea {
+            width: 100%;
+            height: 120px;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            background: #2d2d2d;
+            color: #4CAF50;
+            font-family: monospace;
+            resize: none;
+        }
+        button {
+            padding: 10px 20px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover {
+            background: #2980b9;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2>Wave Controls</h2>
+        
+        <div class="control-group">
+            <label for="waveCount">Complexity (Number of Waves)</label>
+            <input type="range" id="waveCount" min="1" max="10" value="4">
+        </div>
+
+        <div class="control-group">
+            <label for="waveHeight">Height (Amplitude)</label>
+            <input type="range" id="waveHeight" min="10" max="150" value="80">
+        </div>
+
+        <div class="control-group">
+            <label for="waveColor">Wave Color</label>
+            <input type="color" id="waveColor" value="#3498db">
+        </div>
+    </div>
+
+    <div class="main-content">
+        <h2>Live Preview</h2>
+        <div class="preview-box" id="preview-svg">
+            </div>
+
+        <div class="code-section">
+            <h2>Generated SVG Code</h2>
+            <textarea id="code-output" readonly></textarea>
+            <button onclick="copyCode()">Copy Code to Clipboard</button>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const waveCountInput = document.getElementById('waveCount');
+        const waveHeightInput = document.getElementById('waveHeight');
+        const waveColorInput = document.getElementById('waveColor');
+        const previewSvg = document.getElementById('preview-svg');
+        const codeOutput = document.getElementById('code-output');
+
+        // Function to generate and update the wave
+        function updateWave() {
+            const count = parseInt(waveCountInput.value);
+            const amplitude = parseInt(waveHeightInput.value);
+            const color = waveColorInput.value;
+            
+            const width = 1000;  // SVG ViewBox Width
+            const height = 300;  // SVG ViewBox Height
+            const baseline = 150; // The middle line where waves oscillate
+            
+            const segmentWidth = width / count;
+            
+            // Start path at bottom-left, then draw line up to the baseline
+            let pathD = `M 0 ${height} L 0 ${baseline} `;
+            
+            // Generate Quadratic Bezier Curves for each wave segment
+            for (let i = 1; i <= count; i++) {
+                let x = i * segmentWidth; // End point X of this segment
+                let cx = x - (segmentWidth / 2); // Control point X (middle of segment)
+                
+                // Alternate the control point Y above and below the baseline
+                let cy = baseline + (i % 2 === 0 ? amplitude : -amplitude);
+                
+                // Add curve command: Q controlPointX controlPointY, endPointX endPointY
+                pathD += `Q ${cx} ${cy}, ${x} ${baseline} `;
+            }
+            
+            // Close the path by drawing a line to bottom-right, then back to start (Z)
+            pathD += `L ${width} ${height} Z`;
+            
+            // Build the final SVG string
+            const svgCode = `<svg viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">\n  <path fill="${color}" d="${pathD}"></path>\n</svg>`;
+            
+            // Inject into the DOM
+            previewSvg.innerHTML = svgCode;
+            codeOutput.value = svgCode;
+        }
+
+        // Function to copy code to clipboard
+        function copyCode() {
+            codeOutput.select();
+            document.execCommand('copy');
+            alert("Code copied successfully! Bro, you are ready to paste it.");
+        }
+
+        // Event Listeners to update wave on slider change
+        waveCountInput.addEventListener('input', updateWave);
+        waveHeightInput.addEventListener('input', updateWave);
+        waveColorInput.addEventListener('input', updateWave);
+
+        // Initial call to generate the first wave on page load
+        updateWave();
+    </script>
+</body>
+</html>
