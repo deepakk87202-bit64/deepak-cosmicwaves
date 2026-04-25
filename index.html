@@ -1,681 +1,1286 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deepak | Cosmic Design Suite Pro</title>
-    <style>
-        /* CSS Variables for Light & Dark Theme */
-        :root {
-            --bg-color: #f0f4f8;
-            --text-color: #1e293b;
-            --panel-bg: #ffffff;
-            --border-color: #e2e8f0;
-            --primary: #6366f1;
-            --primary-hover: #4f46e5;
-            --svg-bg: #e9ecef;
-            --code-bg: #1e293b;
-            --code-text: #a7f3d0;
-            --tab-inactive: #cbd5e1;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Cosmic Design Suite Pro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700;900&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+/* ─── TOKENS ─── */
+:root {
+  --bg:        #05070f;
+  --surface:   #0d1117;
+  --surface2:  #141920;
+  --border:    #1e2a38;
+  --border2:   #263445;
+  --text:      #e2eaf5;
+  --muted:     #7a8fa8;
+  --primary:   #6366f1;
+  --primary-g: #818cf8;
+  --accent:    #f472b6;
+  --green:     #34d399;
+  --yellow:    #fbbf24;
+  --red:       #f87171;
+  --font-head: 'Unbounded', sans-serif;
+  --font-body: 'Plus Jakarta Sans', sans-serif;
+  --radius:    14px;
+  --radius-sm: 9px;
+  --shadow:    0 8px 32px rgba(0,0,0,0.45);
+  --glow:      0 0 20px rgba(99,102,241,0.25);
+  --trans:     0.22s cubic-bezier(0.4,0,0.2,1);
+}
+[data-theme="light"] {
+  --bg:        #f4f6fb;
+  --surface:   #ffffff;
+  --surface2:  #eef1f8;
+  --border:    #dce3ef;
+  --border2:   #c8d3e6;
+  --text:      #1a2035;
+  --muted:     #5a6a84;
+  --primary:   #4f46e5;
+  --primary-g: #6366f1;
+  --accent:    #ec4899;
+  --shadow:    0 8px 32px rgba(0,0,0,0.10);
+  --glow:      0 0 20px rgba(99,102,241,0.12);
+}
 
-        [data-theme="dark"] {
-            --bg-color: #0f172a;
-            --text-color: #f8fafc;
-            --panel-bg: #1e293b;
-            --border-color: #334155;
-            --primary: #818cf8;
-            --primary-hover: #6366f1;
-            --svg-bg: #0b1120;
-            --code-bg: #000000;
-            --code-text: #34d399;
-            --tab-inactive: #475569;
-        }
+/* ─── RESET ─── */
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
-        }
+/* ─── HEADER ─── */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  height: 60px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+.logo {
+  font-family: var(--font-head);
+  font-size: 0.85rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, var(--primary-g) 0%, var(--accent) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  white-space: nowrap;
+}
+.header-right { display: flex; align-items: center; gap: 10px; }
+.theme-btn {
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  color: var(--text);
+  padding: 6px 14px;
+  border-radius: 30px;
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--trans);
+  white-space: nowrap;
+}
+.theme-btn:hover { border-color: var(--primary); color: var(--primary); }
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
+/* ─── LAYOUT ─── */
+.app {
+  flex: 1;
+  display: flex;
+  max-width: 1380px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 20px;
+  gap: 20px;
+}
 
-        /* Header */
-        header {
-            background-color: var(--panel-bg);
-            padding: 15px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border-color);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
+/* ─── SIDEBAR ─── */
+.sidebar {
+  width: 310px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
 
-        .logo {
-            font-size: 1.5rem;
-            font-weight: 800;
-            background: linear-gradient(45deg, var(--primary), #ec4899);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+/* ─── SURFACE CARD ─── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+.card-title {
+  font-family: var(--font-head);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
 
-        .theme-toggle {
-            background: var(--border-color);
-            border: none;
-            padding: 8px 16px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-weight: bold;
-            color: var(--text-color);
-        }
+/* ─── TAB NAV ─── */
+.tab-nav {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 6px;
+  display: flex;
+  gap: 4px;
+}
+.tab-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 6px;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: transparent;
+  color: var(--muted);
+  transition: var(--trans);
+  white-space: nowrap;
+}
+.tab-btn .icon { font-size: 1rem; }
+.tab-btn:hover { color: var(--text); background: var(--surface2); }
+.tab-btn.active {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 0 0 1px var(--primary), var(--glow);
+}
 
-        /* Main Layout */
-        .container {
-            display: flex;
-            flex-grow: 1;
-            padding: 20px;
-            gap: 20px;
-            max-width: 1400px;
-            margin: 0 auto;
-            width: 100%;
-        }
+/* ─── CONTROLS SECTION ─── */
+.ctrl-section { display: none; }
+.ctrl-section.active { display: flex; flex-direction: column; gap: 12px; }
 
-        /* Sidebar */
-        .sidebar {
-            width: 350px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
+/* ─── CONTROL GROUPS ─── */
+.ctrl-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.ctrl-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+.ctrl-val {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--primary-g);
+  background: var(--surface2);
+  padding: 2px 8px;
+  border-radius: 5px;
+  min-width: 36px;
+  text-align: center;
+}
+.ctrl-col { display: flex; flex-direction: column; gap: 7px; }
 
-        /* Tabs UI */
-        .tabs {
-            display: flex;
-            gap: 5px;
-            background: var(--panel-bg);
-            padding: 8px;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-        }
+/* ─── RANGE SLIDER ─── */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border2);
+  outline: none;
+  cursor: pointer;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: var(--primary);
+  border: 2px solid var(--bg);
+  box-shadow: 0 0 0 2px var(--primary);
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+input[type="range"]::-moz-range-thumb {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: var(--primary);
+  border: 2px solid var(--bg);
+  cursor: pointer;
+}
 
-        .tab-btn {
-            flex: 1;
-            padding: 10px;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            background: var(--tab-inactive);
-            color: var(--text-color);
-            font-size: 0.9rem;
-        }
+/* ─── COLOR PICKER ─── */
+.color-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+}
+.color-wrap input[type="color"] {
+  -webkit-appearance: none;
+  width: 32px; height: 32px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  background: none;
+  padding: 0;
+  flex-shrink: 0;
+}
+.color-wrap input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; border-radius: 6px; }
+.color-wrap input[type="color"]::-webkit-color-swatch { border: none; border-radius: 6px; }
+.color-hex {
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+  color: var(--muted);
+  flex: 1;
+}
 
-        .tab-btn.active {
-            background: var(--primary);
-            color: white;
-        }
+/* ─── TOGGLE SWITCH ─── */
+.switch { position: relative; display: inline-flex; align-items: center; cursor: pointer; }
+.switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+.slider-track {
+  width: 44px; height: 24px;
+  background: var(--border2);
+  border-radius: 12px;
+  transition: var(--trans);
+  position: relative;
+}
+.slider-track::after {
+  content: '';
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 18px; height: 18px;
+  background: #fff;
+  border-radius: 50%;
+  transition: var(--trans);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
+.switch input:checked + .slider-track { background: var(--primary); }
+.switch input:checked + .slider-track::after { left: 23px; }
 
-        .panel {
-            background: var(--panel-bg);
-            padding: 25px;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
-        }
+/* ─── SELECT ─── */
+select {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--surface2);
+  color: var(--text);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%237a8fa8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+}
 
-        h3 { margin-bottom: 15px; font-size: 1.2rem; }
+/* ─── BUTTONS ─── */
+.btn {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--trans);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover { background: var(--primary-g); transform: translateY(-1px); box-shadow: var(--glow); }
+.btn-accent { background: var(--accent); color: #fff; }
+.btn-accent:hover { opacity: 0.88; transform: translateY(-1px); }
+.btn-danger { background: var(--red); color: #fff; }
+.btn-danger:hover { opacity: 0.88; }
+.btn-ghost {
+  background: var(--surface2);
+  color: var(--muted);
+  border: 1px solid var(--border2);
+}
+.btn-ghost:hover { color: var(--text); border-color: var(--primary); }
 
-        .control-section { display: none; }
-        .control-section.active { display: block; }
+.btn:active { transform: scale(0.97) !important; }
 
-        .control-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-bottom: 15px;
-        }
+/* ─── DIVIDER ─── */
+.divider { height: 1px; background: var(--border); margin: 4px 0; }
 
-        .row-group {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
+/* ─── TIPS PANEL ─── */
+.tips-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--primary);
+  border-radius: var(--radius);
+  padding: 16px;
+}
+.tips-panel .tip-title {
+  font-family: var(--font-head);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--primary-g);
+  margin-bottom: 10px;
+}
+.tips-panel p, .tips-panel li {
+  font-size: 0.78rem;
+  color: var(--muted);
+  line-height: 1.6;
+}
+.tips-panel ul { padding-left: 14px; margin-top: 6px; }
+.tips-panel li + li { margin-top: 4px; }
 
-        label { font-size: 0.9rem; font-weight: 600; }
-        
-        input[type="range"] {
-            width: 100%;
-            accent-color: var(--primary);
-        }
+/* ─── MAIN CONTENT ─── */
+.main { flex: 1; display: flex; flex-direction: column; gap: 16px; min-width: 0; }
 
-        input[type="color"] {
-            width: 100%;
-            height: 40px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            background: none;
-        }
+/* ─── PREVIEW ─── */
+.preview-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.preview-title {
+  font-family: var(--font-head);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.live-badge {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 0.72rem; font-weight: 700;
+  color: var(--green);
+}
+.live-dot {
+  width: 6px; height: 6px;
+  background: var(--green);
+  border-radius: 50%;
+  animation: pulse-dot 1.5s ease-in-out infinite;
+}
+@keyframes pulse-dot {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.5; transform: scale(1.3); }
+}
+.preview-stage {
+  position: relative;
+  width: 100%;
+  height: 360px;
+  background: var(--bg);
+  background-image:
+    radial-gradient(circle at 20% 80%, rgba(99,102,241,0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(244,114,182,0.06) 0%, transparent 50%),
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 24px 24px, 24px 24px;
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+#preview-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  position: absolute;
+  top: 0; left: 0;
+}
+.dim-badge {
+  position: absolute;
+  top: 12px; left: 50%;
+  transform: translateX(-50%);
+  background: var(--primary);
+  color: #fff;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+  z-index: 10;
+  white-space: nowrap;
+}
+.dim-badge.visible { opacity: 1; }
 
-        /* Toggle Switch CSS */
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 24px;
-        }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 24px;
-        }
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 16px;
-            width: 16px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-        input:checked + .slider { background-color: var(--primary); }
-        input:checked + .slider:before { transform: translateX(26px); }
+/* Shape tap indicator */
+.tap-indicator {
+  position: absolute;
+  top: 12px; right: 16px;
+  background: rgba(244,114,182,0.15);
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  pointer-events: none;
+  display: none;
+}
 
-        /* Main Content */
-        .main-content {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
+/* ─── CODE OUTPUT ─── */
+.code-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.code-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--border);
+}
+.code-header-left { display: flex; align-items: center; gap: 8px; }
+.code-lang {
+  font-size: 0.72rem; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--green);
+  background: rgba(52,211,153,0.1);
+  padding: 3px 8px; border-radius: 4px;
+}
+.code-title {
+  font-family: var(--font-head);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.code-actions { display: flex; gap: 8px; }
+.code-btn {
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid var(--border2);
+  background: var(--surface2);
+  color: var(--text);
+  transition: var(--trans);
+  display: flex; align-items: center; gap: 5px;
+}
+.code-btn:hover { border-color: var(--primary); color: var(--primary); }
+.code-btn.copied { background: var(--green); color: #000; border-color: var(--green); }
+textarea#code-output {
+  width: 100%;
+  height: 160px;
+  padding: 16px 20px;
+  background: #020408;
+  color: #a7f3d0;
+  border: none;
+  border-radius: 0;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+  font-size: 0.78rem;
+  line-height: 1.7;
+  resize: vertical;
+  outline: none;
+  white-space: pre;
+  overflow: auto;
+}
+[data-theme="light"] textarea#code-output {
+  background: #0d1117;
+}
 
-        .preview-box {
-            width: 100%;
-            height: 400px;
-            background: var(--svg-bg);
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            position: relative;
-            overflow: hidden;
-            background-image: radial-gradient(var(--border-color) 1px, transparent 1px);
-            background-size: 20px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+/* ─── SHAPE QUICK-ADD MOBILE ─── */
+.quick-shapes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.shape-preset {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: var(--trans);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+.shape-preset:hover { border-color: var(--primary); color: var(--primary); background: rgba(99,102,241,0.08); }
+.shape-preset svg { flex-shrink: 0; }
 
-        #preview-svg {
-            width: 100%;
-            height: 100%;
-            display: block;
-            position: absolute;
-            top: 0;
-            left: 0;
-        }
+/* ─── LOADING / SPINNER ─── */
+@keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Dimension Label for Drawing */
-        .dim-label {
-            position: absolute;
-            background: var(--primary);
-            color: white;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: bold;
-            pointer-events: none;
-            display: none;
-            white-space: nowrap;
-            z-index: 10;
-        }
+/* ─── MOBILE ─── */
+@media (max-width: 768px) {
+  body { background: var(--bg); }
 
-        textarea {
-            width: 100%;
-            height: 150px;
-            padding: 15px;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            background: var(--code-bg);
-            color: var(--code-text);
-            font-family: 'Courier New', Courier, monospace;
-            resize: none;
-            font-size: 0.85rem;
-            white-space: pre;
-        }
+  .app {
+    flex-direction: column;
+    padding: 12px;
+    gap: 12px;
+  }
 
-        button.copy-btn {
-            padding: 12px 24px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 1rem;
-            cursor: pointer;
-            margin-top: 10px;
-            width: 100%;
-        }
-        button.copy-btn:hover { background: var(--primary-hover); }
+  .sidebar { width: 100%; }
 
-        /* Footer */
-        footer {
-            text-align: center;
-            padding: 20px;
-            background: var(--panel-bg);
-            border-top: 1px solid var(--border-color);
-            font-size: 0.9rem;
-            margin-top: auto;
-        }
-        
-        /* Specialized Buttons */
-        .action-btn {
-            background: #ec4899;
-            color: white;
-            border: none;
-            padding: 10px;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 10px;
-        }
-        .action-btn:hover { background: #d63384; }
+  .preview-stage { height: 280px; }
 
-        /* Knowledge Hub Styling */
-        .info-panel {
-            font-size: 0.85rem;
-            line-height: 1.5;
-            border-left: 4px solid var(--primary);
-            padding-left: 15px;
-        }
-        .info-panel ul { padding-left: 20px; margin-top: 10px; }
-    </style>
+  textarea#code-output { height: 120px; font-size: 0.72rem; }
+
+  .code-actions { gap: 5px; }
+  .code-btn { padding: 5px 10px; font-size: 0.72rem; }
+
+  .tab-btn span.label { display: none; }
+
+  .tips-panel { display: none; } /* hide tips on mobile for space */
+
+  .header-right .theme-btn span.long { display: none; }
+}
+
+@media (max-width: 480px) {
+  header { padding: 0 14px; }
+  .logo { font-size: 0.72rem; }
+  .preview-stage { height: 240px; }
+}
+
+/* ─── FADE ANIM FOR TAB SWITCH ─── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.ctrl-section.active { animation: fadeUp 0.25s ease forwards; }
+
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 10px; }
+
+/* ─── MISC ─── */
+hr.sep { border: none; border-top: 1px solid var(--border); margin: 2px 0; }
+
+/* Status pill */
+.status { display: flex; align-items: center; gap: 6px; font-size: 0.72rem; color: var(--muted); }
+</style>
 </head>
 <body>
 
-    <header>
-        <div class="logo">Deepak | Cosmic Design Suite Pro</div>
-        <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌙 Dark Mode</button>
-    </header>
+<!-- ═══ HEADER ═══ -->
+<header>
+  <div class="logo">✦ Cosmic Design Suite</div>
+  <div class="header-right">
+    <button class="theme-btn" id="themeBtn" onclick="toggleTheme()">
+      <span id="themeIcon">☀️</span> <span class="long">Light Mode</span>
+    </button>
+  </div>
+</header>
 
-    <div class="container">
-        <div class="sidebar">
-            <div class="tabs">
-                <button class="tab-btn active" onclick="switchTab('waves')">🌊 Waves</button>
-                <button class="tab-btn" onclick="switchTab('blobs')">💧 Blobs</button>
-                <button class="tab-btn" onclick="switchTab('shapes')">📐 Shapes</button>
-            </div>
+<!-- ═══ APP LAYOUT ═══ -->
+<div class="app">
 
-            <div class="panel control-section active" id="waves-controls">
-                <h3>Wave Controls</h3>
-                <div class="control-group row-group">
-                    <label>Animated Waves</label>
-                    <label class="switch">
-                        <input type="checkbox" id="wAnimated" checked>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div class="control-group" id="wSpeedBox">
-                    <label>Speed (Seconds)</label>
-                    <input type="range" id="wSpeed" min="2" max="20" value="8" style="direction: rtl;">
-                </div>
-                <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 10px 0;">
-                <div class="control-group">
-                    <label>Complexity (Peaks)</label>
-                    <input type="range" id="wCount" min="1" max="10" value="3">
-                </div>
-                <div class="control-group">
-                    <label>Height (Amplitude)</label>
-                    <input type="range" id="wHeight" min="10" max="150" value="80">
-                </div>
-                <div class="control-group">
-                    <label>Wave Color</label>
-                    <input type="color" id="wColor" value="#ec4899">
-                </div>
-            </div>
+  <!-- ─── SIDEBAR ─── -->
+  <aside class="sidebar">
 
-            <div class="panel control-section" id="blobs-controls">
-                <h3>Blob Controls</h3>
-                <div class="control-group">
-                    <label>Complexity (Points)</label>
-                    <input type="range" id="bPoints" min="4" max="12" value="6">
-                </div>
-                <div class="control-group">
-                    <label>Weirdness (Randomness)</label>
-                    <input type="range" id="bRandomness" min="10" max="100" value="40">
-                </div>
-                <div class="control-group">
-                    <label>Blob Color</label>
-                    <input type="color" id="bColor" value="#818cf8">
-                </div>
-                <button class="action-btn" onclick="updateBlob()">🎲 Randomize Shape</button>
-            </div>
-
-            <div class="panel control-section" id="shapes-controls">
-                <h3>Shape Drawing</h3>
-                <p style="font-size:0.8rem; margin-bottom:10px; opacity:0.8;">Preview canvas par click karke drag karein shape draw karne ke liye.</p>
-                <div class="control-group">
-                    <label>Shape Type</label>
-                    <select id="sShapeType" style="width:100%; padding:8px; border-radius:8px; background:var(--bg-color); color:var(--text-color); border:1px solid var(--border-color);">
-                        <option value="rect">Rectangle</option>
-                        <option value="circle">Circle</option>
-                    </select>
-                </div>
-                <div class="control-group">
-                    <label>Fill Color</label>
-                    <input type="color" id="sFillColor" value="#6366f1">
-                </div>
-                <div class="control-group">
-                    <label>Opacity</label>
-                    <input type="range" id="sOpacity" min="10" max="100" value="50">
-                </div>
-                <button class="tab-btn" onclick="clearShapes()" style="width:100%; background:#ef4444; color:white;">🗑️ Clear Drawing</button>
-            </div>
-
-            <div class="panel info-panel" id="info-hub">
-                <h3>💡 Knowledge Hub</h3>
-                <div id="info-content">Select a tool to see how professionals use it!</div>
-            </div>
-        </div>
-
-        <div class="main-content">
-            <div class="panel">
-                <h3>Live Preview</h3>
-                <div class="preview-box" id="preview-container">
-                    <svg id="preview-svg" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"></svg>
-                    <div id="dim-label" class="dim-label">W: 0, H: 0</div>
-                </div>
-            </div>
-
-            <div class="panel">
-                <h3>Generated SVG Code</h3>
-                <textarea id="code-output" readonly></textarea>
-                <button class="copy-btn" onclick="copyCode()">📋 Copy Code to Clipboard</button>
-            </div>
-        </div>
+    <!-- Tab Nav -->
+    <div class="tab-nav">
+      <button class="tab-btn active" data-tab="waves" onclick="switchTab('waves', this)">
+        <span class="icon">〰</span><span class="label">Waves</span>
+      </button>
+      <button class="tab-btn" data-tab="blobs" onclick="switchTab('blobs', this)">
+        <span class="icon">◉</span><span class="label">Blobs</span>
+      </button>
+      <button class="tab-btn" data-tab="shapes" onclick="switchTab('shapes', this)">
+        <span class="icon">▭</span><span class="label">Shapes</span>
+      </button>
     </div>
 
-    <footer>
-        <p>Created by <strong>Deepak</strong> | Cosmic Design Suite Pro &copy; 2026. Built for Creators.</p>
-    </footer>
+    <!-- ───── WAVES CONTROLS ───── -->
+    <div class="card ctrl-section active" id="ctrl-waves">
+      <div class="card-title">Wave Settings</div>
 
-    <script>
-        let currentTab = 'waves';
-        const svg = document.getElementById('preview-svg');
+      <div class="ctrl-row">
+        <span class="ctrl-label">Animated</span>
+        <label class="switch">
+          <input type="checkbox" id="wAnimated" checked>
+          <span class="slider-track"></span>
+        </label>
+      </div>
 
-        // --- Theme Management ---
-        function toggleTheme() {
-            const body = document.documentElement;
-            const themeBtn = document.getElementById('themeBtn');
-            const isDark = body.getAttribute('data-theme') === 'dark';
-            body.setAttribute('data-theme', isDark ? 'light' : 'dark');
-            themeBtn.textContent = isDark ? '🌙 Dark Mode' : '☀️ Light Mode';
-        }
+      <div id="wSpeedWrap" class="ctrl-col">
+        <div class="ctrl-row">
+          <span class="ctrl-label">Speed</span>
+          <span class="ctrl-val" id="wSpeedVal">8s</span>
+        </div>
+        <input type="range" id="wSpeed" min="2" max="20" value="8">
+      </div>
 
-        // --- Tab Management ---
-        const infoTips = {
-            waves: `<h3>💡 Sine Waves Tips:</h3><ul><li>Smooth flow banane ke liye user ki aankhon ko guide karta hai.</li><li>SaaS startups hero sections aur footers me popular hain.</li><li>Multiple layers (opacity change) premium 3D effect deti hain.</li></ul>`,
-            blobs: `<h3>💡 Organic Blobs Tips:</h3><ul><li>Friendly, organic, aur approachabe feel deta hai.</li><li>Sharp cornersRectangles formal lagte hain, blobs creative lagte hain.</li><li>Tease background elements ko highlights karne me madadgar hai.</li></ul>`,
-            shapes: `<h3>💡 Custom Shapes Tips:</h3><ul><li>Apne specific layout ke liye accurate rectangles aur circles draw karein.</li><li>SVG shapes mobile se lekar 4K monitors tak crisp aur sharp rehte hain.</li><li>Color aur Opacity use karke layered UI elements banayein.</li></ul>`
-        };
+      <hr class="sep">
 
-        function switchTab(mode) {
-            currentTab = mode;
-            // UI Toggle
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.control-section').forEach(sec => sec.classList.remove('active'));
-            
-            event.target.classList.add('active');
-            document.getElementById(mode + '-controls').classList.add('active');
-            
-            // Knowledge Hub update
-            document.getElementById('info-content').innerHTML = infoTips[mode];
-            
-            // Reset Preview State
-            clearSVG();
-            clearShapes();
-            
-            // Preview style updates
-            const container = document.getElementById('preview-container');
-            if (mode === 'shapes') {
-                container.style.cursor = 'crosshair';
-                document.getElementById('code-output').value = ''; // Clear code initially
-            } else {
-                container.style.cursor = 'default';
-                initDrawingEngine(); // Setup drawing listeners only once
-                if(mode === 'waves') updateWave(); else if(mode === 'blobs') updateBlob();
-            }
-        }
+      <div class="ctrl-col">
+        <div class="ctrl-row">
+          <span class="ctrl-label">Complexity</span>
+          <span class="ctrl-val" id="wCountVal">3</span>
+        </div>
+        <input type="range" id="wCount" min="1" max="10" value="3">
+      </div>
 
-        function clearSVG() { svg.innerHTML = ''; }
-        function updateOutput(code) { document.getElementById('code-output').value = code; }
+      <div class="ctrl-col">
+        <div class="ctrl-row">
+          <span class="ctrl-label">Amplitude</span>
+          <span class="ctrl-val" id="wHeightVal">80</span>
+        </div>
+        <input type="range" id="wHeight" min="10" max="150" value="80">
+      </div>
 
-        // ================= WAVES LOGIC (Premium/Animated) =================
-        function generateWavePath(count, amplitude, width, height, baseline, offsetMultiplier) {
-            const totalCount = count * 2; 
-            const totalWidth = width * 2;
-            const segmentWidth = totalWidth / totalCount;
-            let pathD = `M 0 ${height} L 0 ${baseline} `;
-            
-            for (let i = 1; i <= totalCount; i++) {
-                let x = i * segmentWidth;
-                let cx = x - (segmentWidth / 2);
-                let currentAmplitude = amplitude * offsetMultiplier;
-                let cy = baseline + (i % 2 === 0 ? currentAmplitude : -currentAmplitude);
-                pathD += `Q ${cx} ${cy}, ${x} ${baseline} `;
-            }
-            pathD += `L ${totalWidth} ${height} L 0 ${height} Z`;
-            return pathD;
-        }
+      <div class="ctrl-col">
+        <div class="ctrl-row">
+          <span class="ctrl-label">Layers</span>
+          <span class="ctrl-val" id="wLayersVal">3</span>
+        </div>
+        <input type="range" id="wLayers" min="1" max="5" value="3">
+      </div>
 
-        function updateWave() {
-            if(currentTab !== 'waves') return;
-            const count = parseInt(document.getElementById('wCount').value);
-            const amplitude = parseInt(document.getElementById('wHeight').value);
-            const color = document.getElementById('wColor').value;
-            const isAnimated = document.getElementById('wAnimated').checked;
-            const speed = parseInt(document.getElementById('wSpeed').value);
-            
-            const speedBox = document.getElementById('wSpeedBox');
-            speedBox.style.opacity = isAnimated ? "1" : "0.4";
-            document.getElementById('wSpeed').disabled = !isAnimated;
+      <div class="ctrl-col">
+        <span class="ctrl-label">Wave Color</span>
+        <div class="color-wrap">
+          <input type="color" id="wColor" value="#ec4899">
+          <span class="color-hex" id="wColorHex">#ec4899</span>
+        </div>
+      </div>
+    </div>
 
-            const width = 1200; const height = 400; const baseline = 250;
-            const path1 = generateWavePath(count, amplitude, width, height, baseline, 0.5);
-            const path2 = generateWavePath(count, amplitude, width, height, baseline, 0.7);
-            const path3 = generateWavePath(count, amplitude, width, height, baseline, 1.0);
+    <!-- ───── BLOBS CONTROLS ───── -->
+    <div class="card ctrl-section" id="ctrl-blobs">
+      <div class="card-title">Blob Settings</div>
 
-            svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
-            clearSVG();
+      <div class="ctrl-col">
+        <div class="ctrl-row">
+          <span class="ctrl-label">Points</span>
+          <span class="ctrl-val" id="bPointsVal">6</span>
+        </div>
+        <input type="range" id="bPoints" min="3" max="12" value="6">
+      </div>
 
-            let svgCode;
-            if (isAnimated) {
-                // Multi-Layer Animated structure
-                const animatedLayers = `  <g><animateTransform attributeName="transform" type="translate" from="0 0" to="-${width} 0" dur="${speed * 1.5}s" repeatCount="indefinite" /><path fill="${color}" fill-opacity="0.3" d="${path1}"></path></g>\n  <g><animateTransform attributeName="transform" type="translate" from="0 0" to="-${width} 0" dur="${speed * 1.2}s" repeatCount="indefinite" /><path fill="${color}" fill-opacity="0.6" d="${path2}"></path></g>\n  <g><animateTransform attributeName="transform" type="translate" from="0 0" to="-${width} 0" dur="${speed}s" repeatCount="indefinite" /><path fill="${color}" fill-opacity="1" d="${path3}"></path></g>`;
-                svg.innerHTML = animatedLayers;
-                svgCode = `<svg viewBox="0 0 ${width} ${height}" style="width:100%; height:100%;" xmlns="http://www.w3.org/2000/svg">\n${animatedLayers}\n</svg>`;
-            } else {
-                // Multi-Layer Static structure
-                const staticLayers = `  <path fill="${color}" fill-opacity="0.3" d="${path1}"></path>\n  <path fill="${color}" fill-opacity="0.6" d="${path2}"></path>\n  <path fill="${color}" fill-opacity="1" d="${path3}"></path>`;
-                svg.innerHTML = staticLayers;
-                svgCode = `<svg viewBox="0 0 ${width} ${height}" style="width:100%; height:100%;" xmlns="http://www.w3.org/2000/svg">\n${staticLayers}\n</svg>`;
-            }
-            updateOutput(svgCode);
-        }
+      <div class="ctrl-col">
+        <div class="ctrl-row">
+          <span class="ctrl-label">Weirdness</span>
+          <span class="ctrl-val" id="bRandVal">40</span>
+        </div>
+        <input type="range" id="bRand" min="5" max="120" value="40">
+      </div>
 
-        // ================= BLOB LOGIC =================
-        function updateBlob() {
-            if(currentTab !== 'blobs') return;
-            const pointsInput = parseInt(document.getElementById('bPoints').value);
-            const variance = parseInt(document.getElementById('bRandomness').value);
-            const color = document.getElementById('bColor').value;
-            
-            const size = 400; const center = size / 2; const baseRadius = 120;
-            const points = []; const angleStep = (Math.PI * 2) / pointsInput;
+      <div class="ctrl-col">
+        <div class="ctrl-row">
+          <span class="ctrl-label">Size</span>
+          <span class="ctrl-val" id="bSizeVal">140</span>
+        </div>
+        <input type="range" id="bSize" min="60" max="200" value="140">
+      </div>
 
-            for (let i = 0; i < pointsInput; i++) {
-                const angle = i * angleStep;
-                const r = baseRadius + (Math.random() * variance - variance/2);
-                points.push({ x: center + r * Math.cos(angle), y: center + r * Math.sin(angle) });
-            }
+      <div class="ctrl-col">
+        <span class="ctrl-label">Blob Color</span>
+        <div class="color-wrap">
+          <input type="color" id="bColor" value="#818cf8">
+          <span class="color-hex" id="bColorHex">#818cf8</span>
+        </div>
+      </div>
 
-            let d = `M ${(points[0].x + points[points.length-1].x) / 2},${(points[0].y + points[points.length-1].y) / 2} `;
-            for(let i = 0; i < points.length; i++) {
-                let p1 = points[i]; let p2 = points[(i + 1) % points.length];midX = (p1.x + p2.x) / 2; midY = (p1.y + p2.y) / 2;
-                d += `Q ${p1.x},${p1.y} ${midX},${midY} `;
-            }
+      <div class="ctrl-col">
+        <span class="ctrl-label">Second Color (Gradient)</span>
+        <div class="color-wrap">
+          <input type="color" id="bColor2" value="#f472b6">
+          <span class="color-hex" id="bColor2Hex">#f472b6</span>
+        </div>
+      </div>
 
-            svg.setAttribute('viewBox', `0 0 ${size} ${size}`);
-            const pathCode = `<path fill="${color}" d="${d}"></path>`;
-            svg.innerHTML = pathCode;
-            updateOutput(`<svg viewBox="0 0 ${size} ${size}" style="width:100%; height:100%;" xmlns="http://www.w3.org/2000/svg">\n  ${pathCode}\n</svg>`);
-        }
+      <button class="btn btn-accent" onclick="updateBlob()">
+        🎲 Randomize Shape
+      </button>
+    </div>
 
-        // ================= SHAPES DRAWING LOGIC (New & Enhanced) =================
-        let isDrawing = false;
-        let drawingStartX, drawingStartY;
-        let currentShapeElement;
-        const container = document.getElementById('preview-container');
-        const dimLabel = document.getElementById('dim-label');
+    <!-- ───── SHAPES CONTROLS ───── -->
+    <div class="card ctrl-section" id="ctrl-shapes">
+      <div class="card-title">Shape Drawing</div>
 
-        function startShapeDraw(e) {
-            if(currentTab !== 'shapes') return;
-            isDrawing = true;
-            const rect = container.getBoundingClientRect();
-            // Get local coordinates inside SVG
-            drawingStartX = e.clientX - rect.left;
-            drawingStartY = e.clientY - rect.top;
-            
-            const type = document.getElementById('sShapeType').value;
-            currentShapeElement = document.createElementNS("http://www.w3.org/2000/svg", type);
-            
-            // Initial styling from controls
-            updateCurrentShapeStyle();
-            svg.appendChild(currentShapeElement);
-            svg.setAttribute('viewBox', `0 0 400 400`); // Fix viewBox for drawing context
-        }
+      <div class="ctrl-col">
+        <span class="ctrl-label">Shape Type</span>
+        <select id="sType">
+          <option value="rect">⬛ Rectangle</option>
+          <option value="circle">⬤ Circle</option>
+          <option value="rounded">▢ Rounded Rect</option>
+        </select>
+      </div>
 
-        function doShapeDraw(e) {
-            if(!isDrawing || currentTab !== 'shapes') return;
-            const rect = container.getBoundingClientRect();
-            const currentX = e.clientX - rect.left;
-            const currentY = e.clientY - rect.top;
-            
-            const type = document.getElementById('sShapeType').value;
-            const w = Math.abs(currentX - drawingStartX);
-            const h = Math.abs(currentY - drawingStartY);
-            const finalX = Math.min(currentX, drawingStartX);
-            const finalY = Math.min(currentY, drawingStartY);
+      <div class="ctrl-col">
+        <span class="ctrl-label">Fill Color</span>
+        <div class="color-wrap">
+          <input type="color" id="sFill" value="#6366f1">
+          <span class="color-hex" id="sFillHex">#6366f1</span>
+        </div>
+      </div>
 
-            if (type === 'rect') {
-                currentShapeElement.setAttribute('x', finalX);
-                currentShapeElement.setAttribute('y', finalY);
-                currentShapeElement.setAttribute('width', w);
-                currentShapeElement.setAttribute('height', h);
-                dimLabel.innerText = `W: ${Math.round(w)}, H: ${Math.round(h)}`;
-            } else { // Circle
-                const r = Math.sqrt(w * w + h * h);
-                currentShapeElement.setAttribute('cx', drawingStartX);
-                currentShapeElement.setAttribute('cy', drawingStartY);
-                currentShapeElement.setAttribute('r', r);
-                dimLabel.innerText = `R: ${Math.round(r)}`;
-            }
-            
-            // Display dimensions accurately next to mouse
-            dimLabel.style.display = 'block';
-            dimLabel.style.left = (currentX + 15) + 'px';
-            dimLabel.style.top = (currentY + 15) + 'px';
-            updateDrawingOutput();
-        }
+      <div class="ctrl-col">
+        <div class="ctrl-row">
+          <span class="ctrl-label">Opacity</span>
+          <span class="ctrl-val" id="sOpacityVal">60%</span>
+        </div>
+        <input type="range" id="sOpacity" min="10" max="100" value="60">
+      </div>
 
-        function endShapeDraw() {
-            if(!isDrawing || currentTab !== 'shapes') return;
-            isDrawing = false;
-            dimLabel.style.display = 'none';
-        }
+      <div class="ctrl-col">
+        <div class="ctrl-row">
+          <span class="ctrl-label">Border Radius</span>
+          <span class="ctrl-val" id="sRadiusVal">0</span>
+        </div>
+        <input type="range" id="sRadius" min="0" max="100" value="0">
+      </div>
 
-        function clearShapes() {
-            if(currentTab !== 'shapes') return;
-            clearSVG();
-            document.getElementById('code-output').value = '';
-        }
+      <hr class="sep">
 
-        // Functions to update style of drawing while active or from controls
-        function updateCurrentShapeStyle() {
-            if(currentShapeElement && currentTab === 'shapes') {
-                const color = document.getElementById('sFillColor').value;
-                const opacity = document.getElementById('sOpacity').value / 100;
-                currentShapeElement.setAttribute('fill', color);
-                currentShapeElement.setAttribute('fill-opacity', opacity);
-            }
-        }
+      <!-- Quick Add for Mobile -->
+      <span class="ctrl-label" style="margin-bottom:6px;">⚡ Quick Add</span>
+      <div class="quick-shapes">
+        <button class="shape-preset" onclick="quickAddShape('rect', 100, 70)">
+          <svg width="28" height="20"><rect width="28" height="20" rx="2" fill="var(--primary)" opacity="0.7"/></svg>
+          Small Rect
+        </button>
+        <button class="shape-preset" onclick="quickAddShape('rect', 160, 100)">
+          <svg width="28" height="20"><rect width="28" height="20" rx="2" fill="var(--primary)" opacity="0.9"/></svg>
+          Large Rect
+        </button>
+        <button class="shape-preset" onclick="quickAddShape('circle', 50, 50)">
+          <svg width="28" height="28"><circle cx="14" cy="14" r="12" fill="var(--accent)" opacity="0.7"/></svg>
+          Small Circle
+        </button>
+        <button class="shape-preset" onclick="quickAddShape('circle', 100, 100)">
+          <svg width="28" height="28"><circle cx="14" cy="14" r="12" fill="var(--accent)" opacity="0.9"/></svg>
+          Large Circle
+        </button>
+      </div>
 
-        function updateDrawingOutput() {
-            if(currentTab === 'shapes') {
-                const content = svg.innerHTML.trim();
-                if(content === '') { updateOutput(''); return; }
-                const viewBox = svg.getAttribute('viewBox') || '0 0 400 400';
-                updateOutput(`<svg viewBox="${viewBox}" style="width:100%; height:100%;" xmlns="http://www.w3.org/2000/svg">\n  ${content}\n</svg>`);
-            }
-        }
+      <hr class="sep">
 
-        // Event Listeners for controls that change existing drawn shapes
-        document.getElementById('sFillColor').addEventListener('input', () => {
-             updateCurrentShapeStyle();
-             updateDrawingOutput();
-        });
-        document.getElementById('sOpacity').addEventListener('input', () => {
-             updateCurrentShapeStyle();
-             updateDrawingOutput();
-        });
+      <button class="btn btn-danger" onclick="clearShapes()">
+        🗑 Clear All Shapes
+      </button>
+    </div>
 
-        // Initialize mouse events for drawing
-        let drawingEventsInitialized = false;
-        function initDrawingEngine() {
-            if(drawingEventsInitialized) return;
-            container.addEventListener('mousedown', startShapeDraw);
-            window.addEventListener('mousemove', doShapeDraw);
-            window.addEventListener('mouseup', endShapeDraw);
-            drawingEventsInitialized = true;
-        }
+    <!-- Tips -->
+    <div class="tips-panel" id="tips">
+      <div class="tip-title">💡 Pro Tip</div>
+      <div id="tip-content"></div>
+    </div>
 
-        // ================= GENERAL UI LOGIC =================
-        function copyCode() {
-            const codeOutput = document.getElementById('code-output');
-            codeOutput.select();
-            document.execCommand('copy');
-            alert(`Code copied! 🚀 Paste it anywhere in your HTML.`);
-        }
+  </aside>
 
-        // Waves Listeners
-        document.getElementById('wAnimated').addEventListener('change', updateWave);
-        document.getElementById('wSpeed').addEventListener('input', updateWave);
-        document.getElementById('wCount').addEventListener('input', updateWave);
-        document.getElementById('wHeight').addEventListener('input', updateWave);
-        document.getElementById('wColor').addEventListener('input', updateWave);
+  <!-- ─── MAIN ─── -->
+  <main class="main">
 
-        // Blobs Listeners
-        document.getElementById('bPoints').addEventListener('input', updateBlob);
-        document.getElementById('bRandomness').addEventListener('input', updateBlob);
-        document.getElementById('bColor').addEventListener('input', updateBlob);
+    <!-- Preview -->
+    <div class="preview-card">
+      <div class="preview-header">
+        <span class="preview-title">Live Preview</span>
+        <div class="live-badge"><div class="live-dot"></div> Live</div>
+      </div>
+      <div class="preview-stage" id="stage">
+        <svg id="preview-svg" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"></svg>
+        <div class="dim-badge" id="dimBadge">W: 0  H: 0</div>
+        <div class="tap-indicator" id="tapIndicator">✦ Draw on canvas</div>
+      </div>
+    </div>
 
-        // Initial setup
-        initDrawingEngine();
-        updateWave();
-        document.getElementById('info-content').innerHTML = infoTips['waves']; // Initial tip
-    </script>
+    <!-- Code Output -->
+    <div class="code-card">
+      <div class="code-header">
+        <div class="code-header-left">
+          <span class="code-lang">SVG</span>
+          <span class="code-title">Generated Code</span>
+        </div>
+        <div class="code-actions">
+          <button class="code-btn" id="copyBtn" onclick="copyCode()">📋 Copy</button>
+          <button class="code-btn" onclick="downloadSVG()">⬇ Download</button>
+        </div>
+      </div>
+      <textarea id="code-output" readonly spellcheck="false" placeholder="// Your SVG code will appear here..."></textarea>
+    </div>
+
+  </main>
+</div>
+
+<!-- FOOTER -->
+<footer style="text-align:center; padding:16px; border-top:1px solid var(--border); font-size:0.75rem; color:var(--muted);">
+  Created by <strong style="color:var(--primary-g)">Deepak</strong> · Cosmic Design Suite Pro © 2026
+</footer>
+
+<script>
+/* ══════════════════════════════════════════════
+   STATE
+══════════════════════════════════════════════ */
+const state = {
+  tab: 'waves',
+  shapes: [],   // drawn shapes data
+};
+
+const svg      = document.getElementById('preview-svg');
+const stage    = document.getElementById('stage');
+const dimBadge = document.getElementById('dimBadge');
+const tapIndicator = document.getElementById('tapIndicator');
+
+/* ══════════════════════════════════════════════
+   THEME
+══════════════════════════════════════════════ */
+function toggleTheme() {
+  const html = document.documentElement;
+  const dark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', dark ? 'light' : 'dark');
+  document.getElementById('themeIcon').textContent = dark ? '🌙' : '☀️';
+}
+
+/* ══════════════════════════════════════════════
+   TABS
+══════════════════════════════════════════════ */
+const tips = {
+  waves: `<p>Sine waves guide the eye smoothly across the screen. Stack <strong>multiple layers</strong> at different opacities for a rich 3D ocean effect — widely used in SaaS hero sections.</p>`,
+  blobs: `<p>Organic blobs feel friendly and creative. Use a <strong>gradient fill</strong> and offset multiple blobs for a modern glassmorphism background. Less symmetric = more natural.</p>`,
+  shapes: `<p>Draw shapes by <strong>dragging</strong> on the canvas (desktop) or use <strong>Quick Add</strong> buttons (mobile). Combine overlapping shapes with varied opacity for layered UI mockups.</p>`,
+};
+
+function switchTab(name, btn) {
+  state.tab = name;
+
+  // Nav highlight
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  // Panel switch
+  document.querySelectorAll('.ctrl-section').forEach(s => s.classList.remove('active'));
+  document.getElementById('ctrl-' + name).classList.add('active');
+
+  // Tips
+  document.getElementById('tip-content').innerHTML = tips[name];
+
+  // Canvas mode
+  tapIndicator.style.display = name === 'shapes' ? 'block' : 'none';
+  stage.style.cursor = name === 'shapes' ? 'crosshair' : 'default';
+
+  // Reset state
+  state.shapes = [];
+  clearSVG();
+  setCode('');
+
+  if (name === 'waves') updateWave();
+  else if (name === 'blobs') updateBlob();
+}
+
+/* ══════════════════════════════════════════════
+   HELPERS
+══════════════════════════════════════════════ */
+function clearSVG() { svg.innerHTML = ''; }
+function setCode(c) { document.getElementById('code-output').value = c; }
+
+function colorHex(id, hexId) {
+  const val = document.getElementById(id).value;
+  document.getElementById(hexId).textContent = val;
+}
+
+function getPos(e) {
+  const r = stage.getBoundingClientRect();
+  if (e.touches && e.touches.length) {
+    return { x: e.touches[0].clientX - r.left, y: e.touches[0].clientY - r.top };
+  }
+  if (e.changedTouches && e.changedTouches.length) {
+    return { x: e.changedTouches[0].clientX - r.left, y: e.changedTouches[0].clientY - r.top };
+  }
+  return { x: e.clientX - r.left, y: e.clientY - r.top };
+}
+
+/* SVG viewBox is always relative to stage pixel size */
+function svgCoord(px, py) {
+  const r = stage.getBoundingClientRect();
+  const vb = (svg.getAttribute('viewBox') || '0 0 400 400').split(' ').map(Number);
+  return {
+    x: (px / r.width)  * vb[2],
+    y: (py / r.height) * vb[3]
+  };
+}
+
+/* ══════════════════════════════════════════════
+   RANGE SLIDER LIVE VALUES
+══════════════════════════════════════════════ */
+function bindRange(id, valId, suffix, cb) {
+  const el = document.getElementById(id);
+  const show = () => {
+    if (valId) document.getElementById(valId).textContent = el.value + (suffix || '');
+    if (cb) cb();
+  };
+  el.addEventListener('input', show);
+  show();
+}
+
+/* ══════════════════════════════════════════════
+   ════════════ WAVES ════════════
+══════════════════════════════════════════════ */
+function generatePath(peaks, amp, w, h, baseline, scale) {
+  const seg = (w * 2) / (peaks * 2);
+  let d = `M0,${h} L0,${baseline} `;
+  for (let i = 1; i <= peaks * 2; i++) {
+    const x  = i * seg;
+    const cx = x - seg / 2;
+    const cy = baseline + (i % 2 === 0 ? amp * scale : -amp * scale);
+    d += `Q${cx},${cy} ${x},${baseline} `;
+  }
+  d += `L${w * 2},${h} Z`;
+  return d;
+}
+
+function updateWave() {
+  if (state.tab !== 'waves') return;
+
+  const peaks    = +document.getElementById('wCount').value;
+  const amp      = +document.getElementById('wHeight').value;
+  const color    = document.getElementById('wColor').value;
+  const animated = document.getElementById('wAnimated').checked;
+  const speed    = +document.getElementById('wSpeed').value;
+  const layers   = +document.getElementById('wLayers').value;
+
+  // Disable speed slider visually
+  const sw = document.getElementById('wSpeedWrap');
+  sw.style.opacity = animated ? '1' : '0.4';
+  document.getElementById('wSpeed').disabled = !animated;
+
+  const W = 1200, H = 400, base = 270;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  clearSVG();
+
+  let innerSVG = '';
+  const scales = [0.4, 0.6, 0.75, 0.88, 1.0].slice(0, layers);
+  const opacities = [0.2, 0.35, 0.55, 0.75, 1.0].slice(0, layers);
+
+  scales.forEach((sc, i) => {
+    const path = generatePath(peaks, amp, W, H, base, sc);
+    const op   = opacities[i];
+    const dur  = speed * (1 + i * 0.2);
+
+    if (animated) {
+      innerSVG += `<g><animateTransform attributeName="transform" type="translate" from="0,0" to="-${W},0" dur="${dur.toFixed(1)}s" repeatCount="indefinite"/><path fill="${color}" fill-opacity="${op}" d="${path}"/></g>\n`;
+    } else {
+      innerSVG += `<path fill="${color}" fill-opacity="${op}" d="${path}"/>\n`;
+    }
+  });
+
+  svg.innerHTML = innerSVG;
+
+  const code = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">\n${innerSVG}</svg>`;
+  setCode(code);
+}
+
+/* ══════════════════════════════════════════════
+   ════════════ BLOBS ════════════
+══════════════════════════════════════════════ */
+function updateBlob() {
+  if (state.tab !== 'blobs') return;
+
+  const pts    = +document.getElementById('bPoints').value;
+  const rand   = +document.getElementById('bRand').value;
+  const sz     = +document.getElementById('bSize').value;
+  const color1 = document.getElementById('bColor').value;
+  const color2 = document.getElementById('bColor2').value;
+
+  const size = 400, cx = size / 2, cy = size / 2;
+  const step = (Math.PI * 2) / pts;
+  const points = [];
+
+  for (let i = 0; i < pts; i++) {
+    const angle = i * step - Math.PI / 2;
+    const r     = sz + (Math.random() * rand * 2 - rand);
+    points.push({ x: cx + r * Math.cos(angle), y: cy + r * Math.sin(angle) });
+  }
+
+  // Build smooth quadratic bezier path
+  let d = `M${mid(points[pts-1], points[0])} `;
+  for (let i = 0; i < pts; i++) {
+    const p1 = points[i];
+    const p2 = points[(i + 1) % pts];
+    d += `Q${p1.x.toFixed(1)},${p1.y.toFixed(1)} ${mid(p1, p2)} `;
+  }
+  d += 'Z';
+
+  svg.setAttribute('viewBox', `0 0 ${size} ${size}`);
+
+  const gradId = 'blobGrad' + Date.now();
+  const inner = `<defs>
+  <radialGradient id="${gradId}" cx="40%" cy="40%" r="60%">
+    <stop offset="0%" stop-color="${color1}"/>
+    <stop offset="100%" stop-color="${color2}"/>
+  </radialGradient>
+</defs>
+<path fill="url(#${gradId})" d="${d}"/>`;
+
+  svg.innerHTML = inner;
+  setCode(`<svg viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">\n${inner}\n</svg>`);
+}
+
+function mid(a, b) {
+  return `${((a.x + b.x) / 2).toFixed(1)},${((a.y + b.y) / 2).toFixed(1)}`;
+}
+
+/* ══════════════════════════════════════════════
+   ════════════ SHAPES ════════════
+══════════════════════════════════════════════ */
+const VB_W = 400, VB_H = 400;
+
+let drawing   = false;
+let startPx   = { x: 0, y: 0 };
+let activeSel = null;  // currently drawing element
+
+function shapeStart(e) {
+  if (state.tab !== 'shapes') return;
+  if (e.type === 'touchstart') e.preventDefault();
+
+  drawing = true;
+  startPx = getPos(e);
+
+  const type = document.getElementById('sType').value;
+  const ns = 'http://www.w3.org/2000/svg';
+  const tagMap = { rect: 'rect', circle: 'circle', rounded: 'rect' };
+  activeSel = document.createElementNS(ns, tagMap[type]);
+  activeSel.dataset.kind = type;
+
+  applyShapeStyle(activeSel);
+  svg.setAttribute('viewBox', `0 0 ${VB_W} ${VB_H}`);
+  svg.appendChild(activeSel);
+
+  dimBadge.classList.add('visible');
+}
+
+function shapeMove(e) {
+  if (!drawing || state.tab !== 'shapes') return;
+  if (e.type === 'touchmove') e.preventDefault();
+
+  const pos = getPos(e);
+  const r   = stage.getBoundingClientRect();
+
+  // Scale px → viewBox coords
+  const scaleX = VB_W / r.width;
+  const scaleY = VB_H / r.height;
+
+  const sx = startPx.x * scaleX, sy = startPx.y * scaleY;
+  const ex = pos.x    * scaleX, ey = pos.y    * scaleY;
+
+  const w  = Math.abs(ex - sx);
+  const h  = Math.abs(ey - sy);
+  const fx = Math.min(sx, ex);
+  const fy = Math.min(sy, ey);
+  const kind = activeSel ? activeSel.dataset.kind : 'rect';
+
+  if (kind === 'circle') {
+    const radius = Math.sqrt(w * w + h * h) / 2;
+    activeSel.setAttribute('cx', sx);
+    activeSel.setAttribute('cy', sy);
+    activeSel.setAttribute('r',  Math.max(1, radius));
+    dimBadge.textContent = `R: ${Math.round(radius)}`;
+  } else {
+    activeSel.setAttribute('x', fx);
+    activeSel.setAttribute('y', fy);
+    activeSel.setAttribute('width',  Math.max(1, w));
+    activeSel.setAttribute('height', Math.max(1, h));
+    if (kind === 'rounded') {
+      const rx = +document.getElementById('sRadius').value;
+      activeSel.setAttribute('rx', rx);
+      activeSel.setAttribute('ry', rx);
+    }
+    dimBadge.textContent = `W: ${Math.round(w)}  H: ${Math.round(h)}`;
+  }
+
+  updateShapeCode();
+}
+
+function shapeEnd(e) {
+  if (!drawing || state.tab !== 'shapes') return;
+  drawing = false;
+  activeSel = null;
+  dimBadge.classList.remove('visible');
+  updateShapeCode();
+}
+
+function applyShapeStyle(el) {
+  const fill    = document.getElementById('sFill').value;
+  const opacity = +document.getElementById('sOpacity').value / 100;
+  el.setAttribute('fill',         fill);
+  el.setAttribute('fill-opacity', opacity);
+}
+
+function updateShapeCode() {
+  const content = svg.innerHTML.trim();
+  if (!content) { setCode(''); return; }
+  setCode(`<svg viewBox="0 0 ${VB_W} ${VB_H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">\n  ${content}\n</svg>`);
+}
+
+function quickAddShape(type, w, h) {
+  if (state.tab !== 'shapes') return;
+  svg.setAttribute('viewBox', `0 0 ${VB_W} ${VB_H}`);
+
+  const ns = 'http://www.w3.org/2000/svg';
+  const fill    = document.getElementById('sFill').value;
+  const opacity = +document.getElementById('sOpacity').value / 100;
+  const cx = VB_W / 2, cy = VB_H / 2;
+
+  let el;
+  if (type === 'circle') {
+    el = document.createElementNS(ns, 'circle');
+    el.setAttribute('cx', cx);
+    el.setAttribute('cy', cy);
+    el.setAttribute('r',  w / 2);
+  } else {
+    el = document.createElementNS(ns, 'rect');
+    el.setAttribute('x',      cx - w / 2);
+    el.setAttribute('y',      cy - h / 2);
+    el.setAttribute('width',  w);
+    el.setAttribute('height', h);
+    const rx = +document.getElementById('sRadius').value;
+    if (rx) { el.setAttribute('rx', rx); el.setAttribute('ry', rx); }
+  }
+
+  el.setAttribute('fill',         fill);
+  el.setAttribute('fill-opacity', opacity);
+  svg.appendChild(el);
+  updateShapeCode();
+}
+
+function clearShapes() {
+  if (state.tab !== 'shapes') return;
+  clearSVG();
+  setCode('');
+}
+
+/* ══════════════════════════════════════════════
+   COPY / DOWNLOAD
+══════════════════════════════════════════════ */
+function copyCode() {
+  const ta = document.getElementById('code-output');
+  if (!ta.value.trim()) return;
+  navigator.clipboard.writeText(ta.value).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = '✓ Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '📋 Copy'; btn.classList.remove('copied'); }, 2000);
+  }).catch(() => {
+    ta.select();
+    document.execCommand('copy');
+  });
+}
+
+function downloadSVG() {
+  const code = document.getElementById('code-output').value.trim();
+  if (!code) return;
+  const blob = new Blob([code], { type: 'image/svg+xml' });
+  const a    = document.createElement('a');
+  a.href     = URL.createObjectURL(blob);
+  a.download = `cosmic-${state.tab}-${Date.now()}.svg`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+/* ══════════════════════════════════════════════
+   EVENT BINDING
+══════════════════════════════════════════════ */
+
+// Drawing events (mouse + touch)
+stage.addEventListener('mousedown',  shapeStart, { passive: false });
+window.addEventListener('mousemove', shapeMove,  { passive: false });
+window.addEventListener('mouseup',   shapeEnd,   { passive: false });
+
+stage.addEventListener('touchstart', shapeStart, { passive: false });
+window.addEventListener('touchmove', shapeMove,  { passive: false });
+window.addEventListener('touchend',  shapeEnd,   { passive: false });
+
+// Waves
+['wAnimated','wSpeed','wCount','wHeight','wLayers','wColor'].forEach(id => {
+  document.getElementById(id).addEventListener(id === 'wAnimated' ? 'change' : 'input', updateWave);
+});
+
+// Blobs
+['bPoints','bRand','bSize','bColor','bColor2'].forEach(id => {
+  document.getElementById(id).addEventListener('input', updateBlob);
+});
+
+// Color hex label sync
+const colorPairs = [
+  ['wColor','wColorHex'], ['bColor','bColorHex'],
+  ['bColor2','bColor2Hex'], ['sFill','sFillHex']
+];
+colorPairs.forEach(([id, hexId]) => {
+  const el = document.getElementById(id);
+  const hx = document.getElementById(hexId);
+  el.addEventListener('input', () => hx.textContent = el.value);
+});
+
+// Range value displays
+bindRange('wSpeed',  'wSpeedVal',  's', updateWave);
+bindRange('wCount',  'wCountVal',  '',  updateWave);
+bindRange('wHeight', 'wHeightVal', '',  updateWave);
+bindRange('wLayers', 'wLayersVal', '',  updateWave);
+bindRange('bPoints', 'bPointsVal', '',  updateBlob);
+bindRange('bRand',   'bRandVal',   '',  updateBlob);
+bindRange('bSize',   'bSizeVal',   '',  updateBlob);
+bindRange('sOpacity','sOpacityVal','%', null);
+bindRange('sRadius', 'sRadiusVal', '',  null);
+
+// Shape style live update
+['sFill','sOpacity'].forEach(id => {
+  document.getElementById(id).addEventListener('input', () => {
+    // update last drawn element if still on shapes tab
+    if (state.tab === 'shapes' && svg.children.length) {
+      Array.from(svg.children).forEach(el => applyShapeStyle(el));
+      updateShapeCode();
+    }
+  });
+});
+
+/* ══════════════════════════════════════════════
+   INIT
+══════════════════════════════════════════════ */
+document.getElementById('tip-content').innerHTML = tips['waves'];
+tapIndicator.style.display = 'none';
+updateWave();
+</script>
 </body>
 </html>
