@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+
+  <!-- ═══ META ═══ -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Deepak | Cosmic Design Suite Pro</title>
+  <meta name="description" content="Generate SVG waves, blobs and shapes instantly. Built by Deepak.">
+
+  <!-- ═══ FONTS (Google Fonts) ═══ -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700;900&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+  <!-- ═══ STYLES ═══ -->
+  <link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════
+       HEADER
+       — Logo, Theme Toggle
+  ════════════════════════════════════════════ -->
+  <header>
+
+    <div class="logo">✦ Cosmic Design Suite Pro</div>
+
+    <div class="header-right">
+      <button class="theme-btn" id="themeBtn" onclick="toggleTheme()">
+        <span id="themeIcon">☀️</span>
+        <span class="long"> Light Mode</span>
+      </button>
+    </div>
+
+  </header>
+
+
+  <!-- ═══════════════════════════════════════════
+       MAIN APP LAYOUT
+       — Sidebar (controls) + Main (preview + code)
+  ════════════════════════════════════════════ -->
+  <div class="app">
+
+
+    <!-- ──────────────────────────────────────
+         SIDEBAR
+    ─────────────────────────────────────── -->
+    <aside class="sidebar">
+
+
+      <!-- ── TAB NAVIGATION ── -->
+      <nav class="tab-nav" role="tablist" aria-label="Generator Mode">
+
+        <button class="tab-btn active"
+                role="tab" aria-selected="true"
+                data-tab="waves"
+                onclick="switchTab('waves', this)">
+          <span class="icon">〰</span>
+          <span class="label">Waves</span>
+        </button>
+
+        <button class="tab-btn"
+                role="tab" aria-selected="false"
+                data-tab="blobs"
+                onclick="switchTab('blobs', this)">
+          <span class="icon">◉</span>
+          <span class="label">Blobs</span>
+        </button>
+
+        <button class="tab-btn"
+                role="tab" aria-selected="false"
+                data-tab="shapes"
+                onclick="switchTab('shapes', this)">
+          <span class="icon">▭</span>
+          <span class="label">Shapes</span>
+        </button>
+
+      </nav>
+
+
+      <!-- ════════════════════════════════════
+           WAVES CONTROLS
+      ════════════════════════════════════ -->
+      <div class="card ctrl-section active" id="ctrl-waves" role="tabpanel">
+        <div class="card-title">Wave Settings</div>
+
+        <!-- Animated toggle -->
+        <div class="ctrl-row">
+          <span class="ctrl-label">Animated</span>
+          <label class="switch" aria-label="Toggle wave animation">
+            <input type="checkbox" id="wAnimated" checked>
+            <span class="slider-track"></span>
+          </label>
+        </div>
+
+        <!-- Speed (only relevant when animated) -->
+        <div id="wSpeedWrap" class="ctrl-col">
+          <div class="ctrl-row">
+            <span class="ctrl-label">Speed</span>
+            <span class="ctrl-val" id="wSpeedVal">8s</span>
+          </div>
+          <input type="range" id="wSpeed" min="2" max="20" value="8"
+                 aria-label="Animation speed">
+        </div>
+
+        <hr class="sep">
+
+        <!-- Complexity / peaks -->
+        <div class="ctrl-col">
+          <div class="ctrl-row">
+            <span class="ctrl-label">Complexity</span>
+            <span class="ctrl-val" id="wCountVal">3</span>
+          </div>
+          <input type="range" id="wCount" min="1" max="10" value="3"
+                 aria-label="Wave peaks">
+        </div>
+
+        <!-- Amplitude / height -->
+        <div class="ctrl-col">
+          <div class="ctrl-row">
+            <span class="ctrl-label">Amplitude</span>
+            <span class="ctrl-val" id="wHeightVal">80</span>
+          </div>
+          <input type="range" id="wHeight" min="10" max="150" value="80"
+                 aria-label="Wave height">
+        </div>
+
+        <!-- Number of wave layers -->
+        <div class="ctrl-col">
+          <div class="ctrl-row">
+            <span class="ctrl-label">Layers</span>
+            <span class="ctrl-val" id="wLayersVal">3</span>
+          </div>
+          <input type="range" id="wLayers" min="1" max="5" value="3"
+                 aria-label="Wave layers">
+        </div>
+
+        <!-- Wave color -->
+        <div class="ctrl-col">
+          <span class="ctrl-label">Wave Color</span>
+          <div class="color-wrap">
+            <input type="color" id="wColor" value="#ec4899"
+                   aria-label="Wave color picker">
+            <span class="color-hex" id="wColorHex">#ec4899</span>
+          </div>
+        </div>
+
+      </div><!-- /ctrl-waves -->
+
+
+      <!-- ════════════════════════════════════
+           BLOBS CONTROLS
+      ════════════════════════════════════ -->
+      <div class="card ctrl-section" id="ctrl-blobs" role="tabpanel">
+        <div class="card-title">Blob Settings</div>
+
+        <!-- Point count -->
+        <div class="ctrl-col">
+          <div class="ctrl-row">
+            <span class="ctrl-label">Points</span>
+            <span class="ctrl-val" id="bPointsVal">6</span>
+          </div>
+          <input type="range" id="bPoints" min="3" max="12" value="6"
+                 aria-label="Blob points">
+        </div>
+
+        <!-- Weirdness / randomness -->
+        <div class="ctrl-col">
+          <div class="ctrl-row">
+            <span class="ctrl-label">Weirdness</span>
+            <span class="ctrl-val" id="bRandVal">40</span>
+          </div>
+          <input type="range" id="bRand" min="5" max="120" value="40"
+                 aria-label="Blob randomness">
+        </div>
+
+        <!-- Overall size / radius -->
+        <div class="ctrl-col">
+          <div class="ctrl-row">
+            <span class="ctrl-label">Size</span>
+            <span class="ctrl-val" id="bSizeVal">140</span>
+          </div>
+          <input type="range" id="bSize" min="60" max="200" value="140"
+                 aria-label="Blob size">
+        </div>
+
+        <!-- Primary color -->
+        <div class="ctrl-col">
+          <span class="ctrl-label">Primary Color</span>
+          <div class="color-wrap">
+            <input type="color" id="bColor" value="#818cf8"
+                   aria-label="Blob primary color">
+            <span class="color-hex" id="bColorHex">#818cf8</span>
+          </div>
+        </div>
+
+        <!-- Secondary / gradient color -->
+        <div class="ctrl-col">
+          <span class="ctrl-label">Gradient Color</span>
+          <div class="color-wrap">
+            <input type="color" id="bColor2" value="#f472b6"
+                   aria-label="Blob gradient end color">
+            <span class="color-hex" id="bColor2Hex">#f472b6</span>
+          </div>
+        </div>
+
+        <!-- Randomize button -->
+        <button class="btn btn-accent" onclick="updateBlob()">
+          🎲 Randomize Shape
+        </button>
+
+      </div><!-- /ctrl-blobs -->
+
+
+      <!-- ════════════════════════════════════
+           SHAPES CONTROLS
+      ════════════════════════════════════ -->
+      <div class="card ctrl-section" id="ctrl-shapes" role="tabpanel">
+        <div class="card-title">Shape Drawing</div>
+
+        <!-- Shape type selector -->
+        <div class="ctrl-col">
+          <span class="ctrl-label">Shape Type</span>
+          <select id="sType" aria-label="Choose shape type">
+            <option value="rect">⬛ Rectangle</option>
+            <option value="circle">⬤ Circle</option>
+            <option value="rounded">▢ Rounded Rect</option>
+          </select>
+        </div>
+
+        <!-- Fill color -->
+        <div class="ctrl-col">
+          <span class="ctrl-label">Fill Color</span>
+          <div class="color-wrap">
+            <input type="color" id="sFill" value="#6366f1"
+                   aria-label="Shape fill color">
+            <span class="color-hex" id="sFillHex">#6366f1</span>
+          </div>
+        </div>
+
+        <!-- Opacity -->
+        <div class="ctrl-col">
+          <div class="ctrl-row">
+            <span class="ctrl-label">Opacity</span>
+            <span class="ctrl-val" id="sOpacityVal">60%</span>
+          </div>
+          <input type="range" id="sOpacity" min="10" max="100" value="60"
+                 aria-label="Shape opacity">
+        </div>
+
+        <!-- Corner radius (for rounded rect) -->
+        <div class="ctrl-col">
+          <div class="ctrl-row">
+            <span class="ctrl-label">Border Radius</span>
+            <span class="ctrl-val" id="sRadiusVal">0</span>
+          </div>
+          <input type="range" id="sRadius" min="0" max="100" value="0"
+                 aria-label="Border radius">
+        </div>
+
+        <hr class="sep">
+
+        <!-- ── Quick Add (mobile-friendly preset buttons) ── -->
+        <span class="ctrl-label">⚡ Quick Add (Mobile)</span>
+        <div class="quick-shapes">
+
+          <button class="shape-preset"
+                  onclick="quickAddShape('rect', 100, 70)"
+                  aria-label="Add small rectangle">
+            <svg width="28" height="20">
+              <rect width="28" height="20" rx="2" fill="var(--primary)" opacity="0.7"/>
+            </svg>
+            Small Rect
+          </button>
+
+          <button class="shape-preset"
+                  onclick="quickAddShape('rect', 160, 100)"
+                  aria-label="Add large rectangle">
+            <svg width="28" height="20">
+              <rect width="28" height="20" rx="2" fill="var(--primary)" opacity="0.9"/>
+            </svg>
+            Large Rect
+          </button>
+
+          <button class="shape-preset"
+                  onclick="quickAddShape('circle', 50, 50)"
+                  aria-label="Add small circle">
+            <svg width="28" height="28">
+              <circle cx="14" cy="14" r="12" fill="var(--accent)" opacity="0.7"/>
+            </svg>
+            Small Circle
+          </button>
+
+          <button class="shape-preset"
+                  onclick="quickAddShape('circle', 100, 100)"
+                  aria-label="Add large circle">
+            <svg width="28" height="28">
+              <circle cx="14" cy="14" r="12" fill="var(--accent)" opacity="0.9"/>
+            </svg>
+            Large Circle
+          </button>
+
+        </div><!-- /quick-shapes -->
+
+        <hr class="sep">
+
+        <!-- Clear all button -->
+        <button class="btn btn-danger" onclick="clearShapes()">
+          🗑 Clear All Shapes
+        </button>
+
+      </div><!-- /ctrl-shapes -->
+
+
+      <!-- ── TIPS PANEL ── -->
+      <aside class="tips-panel" aria-label="Pro Tips">
+        <div class="tip-title">💡 Pro Tip</div>
+        <div id="tip-content"></div>
+      </aside>
+
+
+    </aside><!-- /sidebar -->
+
+
+    <!-- ──────────────────────────────────────
+         MAIN CONTENT
+    ─────────────────────────────────────── -->
+    <main class="main">
+
+
+      <!-- ── LIVE PREVIEW ── -->
+      <section class="preview-card" aria-label="SVG Preview">
+
+        <div class="preview-header">
+          <span class="preview-title">Live Preview</span>
+          <div class="live-badge">
+            <div class="live-dot"></div>
+            Live
+          </div>
+        </div>
+
+        <!-- Canvas area — mouse/touch drawing happens here -->
+        <div class="preview-stage" id="stage" role="img" aria-label="SVG canvas">
+
+          <!-- The actual SVG element rendered by JS -->
+          <svg id="preview-svg"
+               xmlns="http://www.w3.org/2000/svg"
+               preserveAspectRatio="none">
+          </svg>
+
+          <!-- Dimension badge shown while drawing shapes -->
+          <div class="dim-badge" id="dimBadge" aria-live="polite">W: 0  H: 0</div>
+
+          <!-- Hint label shown in Shapes mode -->
+          <div class="tap-indicator" id="tapIndicator">✦ Draw on canvas</div>
+
+        </div>
+
+      </section><!-- /preview-card -->
+
+
+      <!-- ── CODE OUTPUT ── -->
+      <section class="code-card" aria-label="Generated SVG code">
+
+        <div class="code-header">
+          <div class="code-header-left">
+            <span class="code-lang">SVG</span>
+            <span class="code-title">Generated Code</span>
+          </div>
+          <div class="code-actions">
+            <button class="code-btn" id="copyBtn" onclick="copyCode()">
+              📋 Copy
+            </button>
+            <button class="code-btn" onclick="downloadSVG()">
+              ⬇ Download
+            </button>
+          </div>
+        </div>
+
+        <!-- Readonly textarea showing generated SVG markup -->
+        <textarea id="code-output"
+                  readonly
+                  spellcheck="false"
+                  aria-label="SVG code output"
+                  placeholder="// Your SVG code will appear here...">
+        </textarea>
+
+      </section><!-- /code-card -->
+
+
+    </main><!-- /main -->
+
+
+  </div><!-- /app -->
+
+
+  <!-- ═══════════════════════════════════════════
+       FOOTER
+       — Credits, copyright
+  ════════════════════════════════════════════ -->
+  <footer>
+    Created by <strong>Deepak</strong> ·
+    Cosmic Design Suite Pro © 2026 ·
+    Built for Creators
+  </footer>
+
+
+  <!-- ═══ JAVASCRIPT ═══ -->
+  <!-- Load script.js at the end so DOM is ready -->
+  <script src="script.js"></script>
+
+</body>
+</html>
